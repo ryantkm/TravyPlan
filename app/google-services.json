@@ -1,0 +1,59 @@
+{
+  "project_info": {
+    "project_number": "398299149423",
+    "firebase_url": "https://travyplan-7deb0.firebaseio.com",
+    "project_id": "travyplan-7deb0",
+    "storage_bucket": "travyplan-7deb0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:398299149423:android:e2226274696da430",
+        "android_client_info": {
+          "package_name": "com.eventdee.travyplan"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "398299149423-dh35lkvvtuoeao04lh31p7qgfh1q0h70.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.eventdee.travyplan",
+            "certificate_hash": "bc618e17ec0393b1618904d1fe0dc0d0288a3293"
+          }
+        },
+        {
+          "client_id": "398299149423-60029q0q8sbsmvjsr60l4ie2l6ird3i5.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "398299149423-tkc19acdnfm126eltph1656l46a0ssg1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCSaKoQ2DYfcpUS31V_JbC71DjlYehRx7k"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "398299149423-60029q0q8sbsmvjsr60l4ie2l6ird3i5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
