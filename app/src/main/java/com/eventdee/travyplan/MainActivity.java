@@ -79,19 +79,22 @@ public class MainActivity extends AppCompatActivity
                 firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
                 Toast.makeText(this, "Welcome " + firebaseUser.getDisplayName() + "!", Toast.LENGTH_SHORT).show();
             } else if (resultCode == RESULT_CANCELED) {
-                Toast.makeText(this, "Sign in cancelled! " + response.getErrorCode(), Toast.LENGTH_SHORT).show();
-                finish();
+                Toast.makeText(this, "Sign in cancelled!", Toast.LENGTH_SHORT).show();
+                startSignIn();
             } else {
-                // Sign in failed
-                if (response == null) {
-                    // User pressed back button
-                    Toast.makeText(this, "Sign in cancelled!", Toast.LENGTH_SHORT).show();
-                } else if (response.getErrorCode() == ErrorCodes.NO_NETWORK) {
-                    Toast.makeText(this, "No internet connection!", Toast.LENGTH_SHORT).show();
-                } else if (response.getErrorCode() == ErrorCodes.UNKNOWN_ERROR) {
-                    Toast.makeText(this, "Unknown error!", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(this, "Unknown status!", Toast.LENGTH_SHORT).show();
+                if (shouldStartSignIn()) {
+                    // Sign in failed
+                    if (response == null) {
+                        // User pressed back button
+                        Toast.makeText(this, "Sign in cancelled!", Toast.LENGTH_SHORT).show();
+                    } else if (response.getErrorCode() == ErrorCodes.NO_NETWORK) {
+                        Toast.makeText(this, "No internet connection!", Toast.LENGTH_SHORT).show();
+                    } else if (response.getErrorCode() == ErrorCodes.UNKNOWN_ERROR) {
+                        Toast.makeText(this, "Unknown error!", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(this, "Unknown status!", Toast.LENGTH_SHORT).show();
+                    }
+                    startSignIn();
                 }
             }
         }
@@ -107,13 +110,15 @@ public class MainActivity extends AppCompatActivity
         // Enable Firestore logging
         FirebaseFirestore.setLoggingEnabled(true);
 
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseUser = firebaseAuth.getCurrentUser();
+
         // Firestore
         mFirestore = FirebaseFirestore.getInstance();
 
         // Get ${LIMIT} restaurants
         mQuery = mFirestore.collection("trips")
-                .orderBy("startDate", Query.Direction.DESCENDING)
-                .limit(50);
+                .orderBy("startDate", Query.Direction.DESCENDING);
 
         // RecyclerView
         mAdapter = new TripAdapter(mQuery, this) {
@@ -140,7 +145,7 @@ public class MainActivity extends AppCompatActivity
         mTripsRecycler.setLayoutManager(new LinearLayoutManager(this));
         mTripsRecycler.setAdapter(mAdapter);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -168,35 +173,22 @@ public class MainActivity extends AppCompatActivity
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-
-
-
             }
         });
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-        firebaseAuth = FirebaseAuth.getInstance();
-        firebaseUser = firebaseAuth.getCurrentUser();
-
-        //Now check if this user is null
-        if (firebaseUser == null){
-            //send user to the login page
-            // Create and launch sign-in intent
-            signInPage();
-        }
     }
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -247,17 +239,21 @@ public class MainActivity extends AppCompatActivity
                     .signOut(this)
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         public void onComplete(@NonNull Task<Void> task) {
-                            signInPage();
+                            startSignIn();
                         }
                     });
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
-    private void signInPage() {
+    private boolean shouldStartSignIn() {
+        return (firebaseUser == null);
+    }
+
+    private void startSignIn() {
 
         // Choose authentication providers
         List<AuthUI.IdpConfig> providers = Arrays.asList(
@@ -284,6 +280,12 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onStart() {
         super.onStart();
+
+        // Start sign in if necessary
+        if (shouldStartSignIn()) {
+            startSignIn();
+            return;
+        }
 
         // Start listening for Firestore updates
         if (mAdapter != null) {
