@@ -6,11 +6,11 @@ package com.eventdee.travyplan.utils;
 public final class Constants {
 
     // constants relating to request codes
-    public static final int TRIP_DETAILS_REQUEST = 1;
-    public static final int ADD_TRIP_REQUEST = 2;
-    public static final int ADD_TRIP_ITEM_REQUEST = 3;
-    public static final int GET_IMAGE_REQUEST = 4;
-    public static final int SIGN_IN_REQUEST = 5;
+    public static final int RC_TRIP_DETAILS = 1;
+    public static final int RC_ADD_TRIP = 2;
+    public static final int RC_ADD_TRIP_ITEM = 3;
+    public static final int RC_GET_IMAGE = 4;
+    public static final int RC_SIGN_IN = 5;
 
 //    public static final ArrayList<Integer> mIcons = new ArrayList<Integer>() {{
 //        add(R.drawable.ic_directions_bike);

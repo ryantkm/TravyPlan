@@ -13,7 +13,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,28 +20,21 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.eventdee.travyplan.adapter.TripAdapter;
-import com.eventdee.travyplan.model.Trip;
 import com.eventdee.travyplan.utils.Constants;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -50,7 +42,7 @@ import butterknife.ButterKnife;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, TripAdapter.OnTripSelectedListener {
 
-    private static final String TAG = "RestaurantDetail";
+    private static final String TAG = MainActivity.class.getSimpleName();
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
@@ -72,7 +64,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        if (requestCode == Constants.SIGN_IN_REQUEST) {
+        if (requestCode == Constants.RC_SIGN_IN) {
             IdpResponse response = IdpResponse.fromResultIntent(data);
             if (resultCode == RESULT_OK) {
                 // Successfully signed in
@@ -149,30 +141,35 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-                final SimpleDateFormat FORMAT  = new SimpleDateFormat(
-                        "dd/MM/yyyy", Locale.US);
+                Intent intent = new Intent(getApplicationContext(), AddTripActivity.class);
+//                intent.putExtra(RestaurantDetailActivity.KEY_RESTAURANT_ID, restaurant.getId());
+                startActivity(intent);
+                overridePendingTransition(R.anim.slide_in_from_right, R.anim.slide_out_to_left);
 
-                try {
-                    Trip trip = new Trip("New Zealand", FORMAT.parse("10/01/2018"), FORMAT.parse("21/01/2018"), "https://storage.googleapis.com/firestorequickstarts.appspot.com/food_1.png" );
-                    mFirestore.collection("trips")
-                            .add(trip)
-                            .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                @Override
-                                public void onSuccess(DocumentReference documentReference) {
-                                    Log.d(TAG, "DocumentSnapshot written with ID: " + documentReference.getId());
-                                }
-                            })
-                            .addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Log.w(TAG, "Error adding document", e);
-                                }
-                            });
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
+//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
+//                final SimpleDateFormat FORMAT  = new SimpleDateFormat(
+//                        "dd/MM/yyyy", Locale.US);
+//
+//                try {
+//                    Trip trip = new Trip("New Zealand", FORMAT.parse("10/01/2018"), FORMAT.parse("21/01/2018"), "https://storage.googleapis.com/firestorequickstarts.appspot.com/food_1.png" );
+//                    mFirestore.collection("trips")
+//                            .add(trip)
+//                            .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+//                                @Override
+//                                public void onSuccess(DocumentReference documentReference) {
+//                                    Log.d(TAG, "DocumentSnapshot written with ID: " + documentReference.getId());
+//                                }
+//                            })
+//                            .addOnFailureListener(new OnFailureListener() {
+//                                @Override
+//                                public void onFailure(@NonNull Exception e) {
+//                                    Log.w(TAG, "Error adding document", e);
+//                                }
+//                            });
+//                } catch (ParseException e) {
+//                    e.printStackTrace();
+//                }
             }
         });
 
@@ -269,12 +266,12 @@ public class MainActivity extends AppCompatActivity
 // TODO:                       .setTheme(R.style.LoginTheme)
 // TODO:                       .setLogo(R.drawable.travy_logo)
                         .build(),
-                Constants.SIGN_IN_REQUEST);
+                Constants.RC_SIGN_IN);
     }
 
     @Override
     public void onTripSelected(DocumentSnapshot trip) {
-        Toast.makeText(getApplicationContext(), "trip selected: ", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "trip selected: " + trip.get("name"), Toast.LENGTH_SHORT).show();
     }
 
     @Override

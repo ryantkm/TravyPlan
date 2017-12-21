@@ -1,6 +1,5 @@
 package com.eventdee.travyplan.model;
 
-import java.util.ArrayList;
 import java.util.Date;
 
 public class Trip {
@@ -15,7 +14,6 @@ public class Trip {
     private Date startDate;
     private Date endDate;
     private String coverPhoto;
-    private ArrayList<TripItem> tripItems;
 
     public Trip() {
     }
@@ -25,14 +23,6 @@ public class Trip {
         this.startDate = startDate;
         this.endDate = endDate;
         this.coverPhoto = coverPhoto;
-    }
-
-    public Trip(String name, Date startDate, Date endDate, String coverPhoto, ArrayList<TripItem> tripItems) {
-        this.name = name;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.coverPhoto = coverPhoto;
-        this.tripItems = tripItems;
     }
 
     public String getName() {
@@ -65,13 +55,5 @@ public class Trip {
 
     public void setCoverPhoto(String coverPhoto) {
         this.coverPhoto = coverPhoto;
-    }
-
-    public ArrayList<TripItem> getTripItems() {
-        return tripItems;
-    }
-
-    public void setTripItems(ArrayList<TripItem> tripItems) {
-        this.tripItems = tripItems;
     }
 }

@@ -1,0 +1,20 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.eventdee.travyplanBug.activity.AddTripActivity">
+
+    <item
+        android:id="@+id/action_photo"
+        android:icon="@drawable/ic_photo_camera_white_24dp"
+        android:orderInCategory="100"
+        android:title="update"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_update"
+        android:icon="@drawable/ic_check_white_24dp"
+        android:orderInCategory="100"
+        android:title="update"
+        app:showAsAction="always" />
+
+</menu>
