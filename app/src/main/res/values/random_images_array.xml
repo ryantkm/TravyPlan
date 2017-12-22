@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <array name="random_images_array">
+        <item>@drawable/roadtripnz</item>
+        <item>@drawable/bored_fox</item>
+    </array>
+
+</resources>

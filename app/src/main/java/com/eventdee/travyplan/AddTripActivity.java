@@ -68,6 +68,12 @@ public class AddTripActivity extends AppCompatActivity {
             }
         });
 
+        Glide.with(ivTripPhoto.getContext())
+                .load(General.getRandomDrawableUrl(this))
+                .apply(new RequestOptions()
+                        .centerCrop())
+                .into(ivTripPhoto);
+
         tvStartDate.setText(General.dateFormat.format(mCurrentDate.getTimeInMillis()));
     }
 
