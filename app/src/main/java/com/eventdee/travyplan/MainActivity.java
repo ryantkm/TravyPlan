@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity
     @BindView(R.id.recycler_trips)
     RecyclerView mTripsRecycler;
 
-    @BindView(R.id.view_empty)
+    @BindView(R.id.view_empty_main)
     ViewGroup mEmptyView;
 
     private FirebaseAuth firebaseAuth;
@@ -146,8 +146,6 @@ public class MainActivity extends AppCompatActivity
                 startActivity(intent);
                 overridePendingTransition(R.anim.slide_in_from_right, R.anim.slide_out_to_left);
 
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
 //                final SimpleDateFormat FORMAT  = new SimpleDateFormat(
 //                        "dd/MM/yyyy", Locale.US);
 //
@@ -168,6 +166,8 @@ public class MainActivity extends AppCompatActivity
 //                                }
 //                            });
 //                } catch (ParseException e) {
+//                    e.printStackTrace();
+//                } catch (java.text.ParseException e) {
 //                    e.printStackTrace();
 //                }
             }
@@ -271,7 +271,10 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onTripSelected(DocumentSnapshot trip) {
-        Toast.makeText(this, "trip selected: " + trip.get("name"), Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(getApplicationContext(), TripDetailActivity.class);
+        intent.putExtra(TripDetailActivity.KEY_TRIP_ID, trip.getId());
+        startActivity(intent);
+
     }
 
     @Override

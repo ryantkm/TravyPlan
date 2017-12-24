@@ -2,41 +2,35 @@ package com.eventdee.travyplan.model;
 
 import com.google.android.gms.location.places.Place;
 
+import java.util.Date;
+
 public class TripItem {
-    private String date;
-    private String time;
+    private Date date;
     private String type;
     private Place place;
     private Transport transport;
 
-    public TripItem(String date, String time, String type, Place place) {
+    public TripItem() {
+    }
+
+    public TripItem(Date date, String type, Place place) {
         this.date = date;
-        this.time = time;
         this.type = type;
         this.place = place;
     }
 
-    public TripItem(String date, String time, String type, Transport transport) {
+    public TripItem(Date date, String type, Transport transport) {
         this.date = date;
-        this.time = time;
         this.type = type;
         this.transport = transport;
     }
 
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(Date date) {
         this.date = date;
-    }
-
-    public String getTime() {
-        return time;
-    }
-
-    public void setTime(String time) {
-        this.time = time;
     }
 
     public String getType() {

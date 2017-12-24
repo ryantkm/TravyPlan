@@ -48,7 +48,7 @@ public class AddTripActivity extends AppCompatActivity {
     @BindView(R.id.tv_end_date)
     TextView tvEndDate;
 
-    private int mYear, mMonth, mDay, mHour, mMinute;
+    private int mYear, mMonth, mDay;
     private Calendar mCurrentDate = Calendar.getInstance();
     private Calendar mStartDate = Calendar.getInstance();
     private Calendar mEndDate = Calendar.getInstance();
@@ -93,6 +93,7 @@ public class AddTripActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == Constants.RC_GET_IMAGE && resultCode == RESULT_OK && data != null) {
             mPhotoUri = data.getData();
+
             // Load image
             Glide.with(ivTripPhoto.getContext())
                     .load(mPhotoUri)
@@ -173,18 +174,19 @@ public class AddTripActivity extends AppCompatActivity {
         mTripTitle = etTripName.getText().toString().trim();
         mNewTrip = new Trip(mTripTitle, mStartDate.getTime(), mEndDate.getTime(), mPhotoUri.toString());
 
-        System.out.println("ryan Title: " + mNewTrip.getName());
-        System.out.println("ryan startdate: " + mNewTrip.getStartDate().toString());
-        System.out.println("ryan enddate: " + mNewTrip.getEndDate().toString());
-        System.out.println("ryan photo: " + mNewTrip.getCoverPhoto());
-
         try {
             mFirestore.collection("trips")
                     .add(mNewTrip)
                     .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                         @Override
                         public void onSuccess(DocumentReference documentReference) {
-                            Log.d(TAG, "DocumentSnapshot written with ID: " + documentReference.getId());
+                            String tripId = documentReference.getId();
+                            Log.d(TAG, "DocumentSnapshot written with ID: " + tripId);
+                            // Go to the details page for adding details
+                            Intent intent = new Intent(getApplicationContext(), TripDetailActivity.class);
+                            intent.putExtra(TripDetailActivity.KEY_TRIP_ID, tripId);
+                            startActivity(intent);
+                            overridePendingTransition(R.anim.slide_in_from_right, R.anim.slide_out_to_left);
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
@@ -196,6 +198,5 @@ public class AddTripActivity extends AppCompatActivity {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        finish();
     }
 }
