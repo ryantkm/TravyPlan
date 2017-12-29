@@ -25,6 +25,7 @@ public class TravyPlace {
     private float rating;
     private int priceLevel;
     private String attributions;
+    private String transportMode;
 
     public TravyPlace() {
     }
@@ -169,5 +170,13 @@ public class TravyPlace {
 
     public void setAttributions(String attributions) {
         this.attributions = attributions;
+    }
+
+    public String getTransportMode() {
+        return transportMode;
+    }
+
+    public void setTransportMode(String transportMode) {
+        this.transportMode = transportMode;
     }
 }

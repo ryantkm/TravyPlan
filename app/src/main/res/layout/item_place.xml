@@ -1,9 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
+        android:layout_marginLeft="@dimen/fab_margin"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <View
+            android:id="@+id/connected_line"
+            android:layout_width="2dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:background="@color/colorPrimary"/>
+
+        <ImageView
+            android:id="@+id/iv_transport_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="2dp"
+            android:layout_gravity="center"
+            android:background="@android:color/white"
+            app:srcCompat="@drawable/ic_menu_gallery" />
+
+        <ImageButton
+            android:id="@+id/iv_empty_transport"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|left"
+            android:visibility="gone"
+            android:src="@drawable/ic_menu_camera" />
+
+    </FrameLayout>
 
     <android.support.v7.widget.CardView
         android:layout_width="match_parent"
@@ -52,6 +87,8 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-light"
                     android:gravity="start"
+                    android:maxLines="1"
+                    android:ellipsize="end"
                     android:textSize="21sp" />
 
                 <TextView
@@ -79,8 +116,6 @@
                     android:layout_margin="16dp"
                     android:scaleType="fitCenter"/>
             </LinearLayout>
-
-
 
         </LinearLayout>
 

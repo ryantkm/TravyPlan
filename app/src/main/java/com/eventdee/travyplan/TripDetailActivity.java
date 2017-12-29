@@ -18,7 +18,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.eventdee.travyplan.adapter.TripItemAdapter;
+import com.eventdee.travyplan.adapter.PlaceAdapter;
 import com.eventdee.travyplan.model.Trip;
 import com.eventdee.travyplan.utils.Constants;
 import com.eventdee.travyplan.utils.General;
@@ -35,11 +35,10 @@ import java.util.Date;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class TripDetailActivity extends AppCompatActivity implements EventListener<DocumentSnapshot>, TripItemAdapter.OnTripItemSelectedListener {
+public class TripDetailActivity extends AppCompatActivity implements EventListener<DocumentSnapshot>, PlaceAdapter.OnPlaceSelectedListener {
 
     private static final String TAG = TripDetailActivity.class.getSimpleName();
     public static final String KEY_TRIP_ID = "key_trip_id";
-    private boolean mIsEmpty = true;
     private String mTripId;
 
     @BindView(R.id.iv_trip_photo)
@@ -60,8 +59,8 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
     private FirebaseFirestore mFirestore;
     private DocumentReference mTripRef;
     private ListenerRegistration mTripRegistration;
-
-    private TripItemAdapter mTripItemAdapter;
+    
+    private PlaceAdapter mPlaceAdapter;
 
     private Date mStartDate, mEndDate;
 
@@ -81,7 +80,6 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
                 Intent addPlace = new Intent(getApplicationContext(), AddPlaceActivity.class);
                 addPlace.putExtra("startDate", mStartDate.getTime());
                 addPlace.putExtra("endDate", mEndDate.getTime());
-                addPlace.putExtra("isEmpty", mIsEmpty);
                 addPlace.putExtra(KEY_TRIP_ID, mTripId);
                 startActivityForResult(addPlace, Constants.RC_ADD_TRIP_ITEM);
             }
@@ -106,22 +104,20 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
                 .limit(50);
 
         // RecyclerView
-        mTripItemAdapter = new TripItemAdapter(itemsQuery, this) {
+        mPlaceAdapter = new PlaceAdapter(itemsQuery, this) {
             @Override
             protected void onDataChanged() {
                 if (getItemCount() == 0) {
-                    mIsEmpty = true;
                     mTripItemsRecycler.setVisibility(View.GONE);
                     mEmptyView.setVisibility(View.VISIBLE);
                 } else {
-                    mIsEmpty = false;
                     mTripItemsRecycler.setVisibility(View.VISIBLE);
                     mEmptyView.setVisibility(View.GONE);
                 }
             }
         };
         mTripItemsRecycler.setLayoutManager(new LinearLayoutManager(this));
-        mTripItemsRecycler.setAdapter(mTripItemAdapter);
+        mTripItemsRecycler.setAdapter(mPlaceAdapter);
     }
 
     @Override
@@ -140,7 +136,7 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
     public void onStart() {
         super.onStart();
 
-        mTripItemAdapter.startListening();
+        mPlaceAdapter.startListening();
         mTripRegistration = mTripRef.addSnapshotListener(this);
     }
 
@@ -148,7 +144,7 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
     public void onStop() {
         super.onStop();
 
-        mTripItemAdapter.stopListening();
+        mPlaceAdapter.stopListening();
 
         if (mTripRegistration != null) {
             mTripRegistration.remove();
@@ -191,7 +187,7 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
     }
 
     @Override
-    public void onTripItemSelected(DocumentSnapshot tripItem) {
+    public void onPlaceSelected(DocumentSnapshot place) {
         Toast.makeText(this, "trip item clicked!", Toast.LENGTH_SHORT).show();
     }
 }
