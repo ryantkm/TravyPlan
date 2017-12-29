@@ -1,6 +1,6 @@
 package com.eventdee.travyplan.adapter;
 
-import android.support.v7.widget.RecyclerView.ViewHolder;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +18,7 @@ import com.google.firebase.firestore.Query;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class TripAdapter extends FirestoreAdapter<TripAdapter.TripViewHolder> {
+public class TripAdapter extends FirestoreAdapter<TripAdapter.ViewHolder> {
 
     public interface OnTripSelectedListener {
 
@@ -34,17 +34,17 @@ public class TripAdapter extends FirestoreAdapter<TripAdapter.TripViewHolder> {
     }
 
     @Override
-    public TripViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View item = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_trip, parent, false);
-        return new TripViewHolder(item);
+        return new ViewHolder(item);
     }
 
     @Override
-    public void onBindViewHolder(TripViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, int position) {
         holder.bind(getSnapshot(position), mListener);
     }
 
-    static class TripViewHolder extends ViewHolder {
+    static class ViewHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.iv_trip_photo_main)
         ImageView ivPhoto;
@@ -53,7 +53,7 @@ public class TripAdapter extends FirestoreAdapter<TripAdapter.TripViewHolder> {
         @BindView(R.id.tv_trip_dates_main)
         TextView tvTripDates;
 
-        public TripViewHolder(View itemView) {
+        public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }

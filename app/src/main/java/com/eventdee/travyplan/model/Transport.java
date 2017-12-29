@@ -1,13 +1,20 @@
 package com.eventdee.travyplan.model;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import java.util.Date;
 
-public class Transport implements Parcelable {
+public class Transport {
+
+    private Date date;
     private String name;
+    private String itemType;
 
-    public Transport(String name) {
+    public Transport() {
+    }
+
+    public Transport(Date date, String name) {
+        this.date = date;
         this.name = name;
+        itemType = "transport";
     }
 
     public String getName() {
@@ -18,30 +25,19 @@ public class Transport implements Parcelable {
         this.name = name;
     }
 
-
-    @Override
-    public int describeContents() {
-        return 0;
+    public Date getDate() {
+        return date;
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.name);
+    public void setDate(Date date) {
+        this.date = date;
     }
 
-    protected Transport(Parcel in) {
-        this.name = in.readString();
+    public String getItemType() {
+        return itemType;
     }
 
-    public static final Parcelable.Creator<Transport> CREATOR = new Parcelable.Creator<Transport>() {
-        @Override
-        public Transport createFromParcel(Parcel source) {
-            return new Transport(source);
-        }
-
-        @Override
-        public Transport[] newArray(int size) {
-            return new Transport[size];
-        }
-    };
+    public void setItemType(String itemType) {
+        this.itemType = itemType;
+    }
 }

@@ -16,7 +16,8 @@ public class General {
     private static final String RESTAURANT_URL_FMT = "https://storage.googleapis.com/firestorequickstarts.appspot.com/food_%d.png";
     private static final int MAX_IMAGE_NUM = 22;
 
-    public static SimpleDateFormat dateFormat  = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
+    public static SimpleDateFormat dateFormat  = new SimpleDateFormat("dd.MM.yyyy", Locale.US);
+    public static SimpleDateFormat timeFormat  = new SimpleDateFormat("hh:mm", Locale.US);
 
     /**
      * Get a random image.

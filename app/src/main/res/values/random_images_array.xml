@@ -2,8 +2,13 @@
 <resources>
 
     <array name="random_images_array">
+        <item>@drawable/cinque_terre</item>
+        <item>@drawable/nepal_1</item>
+        <item>@drawable/nepal_2</item>
+        <item>@drawable/nepal_3</item>
+        <item>@drawable/rice_terrace</item>
+        <item>@drawable/blue_stairs</item>
         <item>@drawable/roadtripnz</item>
-        <item>@drawable/bored_fox</item>
     </array>
 
 </resources>

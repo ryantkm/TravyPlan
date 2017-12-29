@@ -4,8 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -18,7 +18,9 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.eventdee.travyplan.adapter.TripItemAdapter;
 import com.eventdee.travyplan.model.Trip;
+import com.eventdee.travyplan.utils.Constants;
 import com.eventdee.travyplan.utils.General;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -26,15 +28,19 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
+
+import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class TripDetailActivity extends AppCompatActivity implements EventListener<DocumentSnapshot> {
+public class TripDetailActivity extends AppCompatActivity implements EventListener<DocumentSnapshot>, TripItemAdapter.OnTripItemSelectedListener {
 
     private static final String TAG = TripDetailActivity.class.getSimpleName();
-
     public static final String KEY_TRIP_ID = "key_trip_id";
+    private boolean mIsEmpty = true;
+    private String mTripId;
 
     @BindView(R.id.iv_trip_photo)
     ImageView ivTripPhoto;
@@ -52,10 +58,12 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
     CollapsingToolbarLayout mCollapsingToolbar;
 
     private FirebaseFirestore mFirestore;
-    private DocumentReference mRestaurantRef;
+    private DocumentReference mTripRef;
     private ListenerRegistration mTripRegistration;
 
-//    private TripItemAdapter mTripItemAdapter;
+    private TripItemAdapter mTripItemAdapter;
+
+    private Date mStartDate, mEndDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,50 +72,56 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
         ButterKnife.bind(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Intent addPlace = new Intent(getApplicationContext(), AddPlaceActivity.class);
+                addPlace.putExtra("startDate", mStartDate.getTime());
+                addPlace.putExtra("endDate", mEndDate.getTime());
+                addPlace.putExtra("isEmpty", mIsEmpty);
+                addPlace.putExtra(KEY_TRIP_ID, mTripId);
+                startActivityForResult(addPlace, Constants.RC_ADD_TRIP_ITEM);
             }
         });
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        // Get restaurant ID from extras
-        String tripId = getIntent().getExtras().getString(KEY_TRIP_ID);
-        if (tripId == null) {
+        // Get trip ID from extras
+        mTripId = getIntent().getExtras().getString(KEY_TRIP_ID);
+        if (mTripId == null) {
             throw new IllegalArgumentException("Must pass extra " + KEY_TRIP_ID);
         }
 
         // Initialize Firestore
         mFirestore = FirebaseFirestore.getInstance();
 
-        // Get reference to the restaurant
-        mRestaurantRef = mFirestore.collection("trips").document(tripId);
+        // Get reference to the trip
+        mTripRef = mFirestore.collection("trips").document(mTripId);
 
-//        // Get trip items
-//        Query itemsQuery = mRestaurantRef
-//                .collection("ratings")
-//                .orderBy("date", Query.Direction.DESCENDING)
-//                .limit(50);
-//
-//        // RecyclerView
-//        mTripItemAdapter = new TripItemAdapter(itemsQuery) {
-//            @Override
-//            protected void onDataChanged() {
-//                if (getItemCount() == 0) {
-//                    mTripItemsRecycler.setVisibility(View.GONE);
-//                    mEmptyView.setVisibility(View.VISIBLE);
-//                } else {
-//                    mTripItemsRecycler.setVisibility(View.VISIBLE);
-//                    mEmptyView.setVisibility(View.GONE);
-//                }
-//            }
-//        };
-//        mTripItemsRecycler.setLayoutManager(new LinearLayoutManager(this));
-//        mTripItemsRecycler.setAdapter(mTripItemAdapter);
+        // Get trip items
+        Query itemsQuery = mTripRef
+                .collection("tripitems")
+                .orderBy("date", Query.Direction.DESCENDING)
+                .limit(50);
+
+        // RecyclerView
+        mTripItemAdapter = new TripItemAdapter(itemsQuery, this) {
+            @Override
+            protected void onDataChanged() {
+                if (getItemCount() == 0) {
+                    mIsEmpty = true;
+                    mTripItemsRecycler.setVisibility(View.GONE);
+                    mEmptyView.setVisibility(View.VISIBLE);
+                } else {
+                    mIsEmpty = false;
+                    mTripItemsRecycler.setVisibility(View.VISIBLE);
+                    mEmptyView.setVisibility(View.GONE);
+                }
+            }
+        };
+        mTripItemsRecycler.setLayoutManager(new LinearLayoutManager(this));
+        mTripItemsRecycler.setAdapter(mTripItemAdapter);
     }
 
     @Override
@@ -117,7 +131,6 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
             case android.R.id.home:
                 Intent addTripToMain = new Intent(this, MainActivity.class);
                 startActivity(addTripToMain);
-                Toast.makeText(this, "back from Detail to Main", Toast.LENGTH_SHORT).show();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -127,15 +140,15 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
     public void onStart() {
         super.onStart();
 
-//        mTripItemAdapter.startListening();
-        mTripRegistration = mRestaurantRef.addSnapshotListener(this);
+        mTripItemAdapter.startListening();
+        mTripRegistration = mTripRef.addSnapshotListener(this);
     }
 
     @Override
     public void onStop() {
         super.onStop();
 
-//        mTripItemAdapter.stopListening();
+        mTripItemAdapter.stopListening();
 
         if (mTripRegistration != null) {
             mTripRegistration.remove();
@@ -150,7 +163,7 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
     }
 
     /**
-     * Listener for the Restaurant document ({@link #mRestaurantRef}).
+     * Listener for the Trip document ({@link #mTripRef}).
      */
     @Override
     public void onEvent(DocumentSnapshot snapshot, FirebaseFirestoreException e) {
@@ -170,9 +183,15 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
                         .centerCrop())
                 .into(ivTripPhoto);
 
-        tvTripDates.setText(String.format("%s to %s", General.dateFormat.format(trip.getStartDate()), General.dateFormat.format(trip.getEndDate())));
+        mStartDate = trip.getStartDate();
+        mEndDate = trip.getEndDate();
+        tvTripDates.setText(String.format("%s to %s", General.dateFormat.format(mStartDate), General.dateFormat.format(mEndDate)));
         mCollapsingToolbar.setTitle(trip.getName());
 
     }
 
+    @Override
+    public void onTripItemSelected(DocumentSnapshot tripItem) {
+        Toast.makeText(this, "trip item clicked!", Toast.LENGTH_SHORT).show();
+    }
 }

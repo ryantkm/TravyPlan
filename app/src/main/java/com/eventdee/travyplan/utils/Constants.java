@@ -11,6 +11,9 @@ public final class Constants {
     public static final int RC_ADD_TRIP_ITEM = 3;
     public static final int RC_GET_IMAGE = 4;
     public static final int RC_SIGN_IN = 5;
+    public static final int RC_PLACE_PICKER = 6;
+
+    public static int TRIP_NUMBER = 1;
 
 //    public static final ArrayList<Integer> mIcons = new ArrayList<Integer>() {{
 //        add(R.drawable.ic_directions_bike);
