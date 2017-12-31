@@ -145,7 +145,6 @@ public class AddPlaceActivity extends AppCompatActivity implements View.OnClickL
     @Override
     public void onClick(View view) {
         if (view == datePicker) {
-
             DatePickerDialog datePickerDialog = new DatePickerDialog(this,
                     new DatePickerDialog.OnDateSetListener() {
 
@@ -200,14 +199,10 @@ public class AddPlaceActivity extends AppCompatActivity implements View.OnClickL
             }
         }
         if (view == placeTypePicker) {
-
             mPlaceTypeDialogFragment.show(getSupportFragmentManager(), PlaceTypeDialogFragment.TAG);
-            // display dialog
         }
 
-
         if (view == btnAdd) {
-
             if (datePicker.getText() == "") {
                 Toast.makeText(this, "Please select a date.", Toast.LENGTH_SHORT).show();
             } else if (place == null) {
@@ -219,7 +214,6 @@ public class AddPlaceActivity extends AppCompatActivity implements View.OnClickL
                     calendar.set(Calendar.HOUR_OF_DAY, 0);
                     calendar.set(Calendar.MINUTE, 0);
                 }
-
                 newTravyPlace = new TravyPlace(calendar.getTime(), mPlaceTypeName);
                 newTravyPlace.setId(place.getId());
                 newTravyPlace.setPlaceTypes(place.getPlaceTypes());

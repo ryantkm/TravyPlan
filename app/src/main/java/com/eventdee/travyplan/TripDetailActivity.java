@@ -10,6 +10,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -152,6 +154,42 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
         overridePendingTransition(R.anim.slide_in_from_left, R.anim.slide_out_to_right);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_trip_detail, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case R.id.action_edit_cover:
+                Toast.makeText(this, "edit cover/info", Toast.LENGTH_SHORT).show();
+                return true;
+            case R.id.action_delete_trip:
+                mTripRef
+                        .delete()
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Log.d(TAG, "Trip successfully deleted!");
+                                Toast.makeText(TripDetailActivity.this, "Trip deleted!", Toast.LENGTH_SHORT).show();
+                                finish();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.w(TAG, "Error deleting document", e);
+                            }
+                        });
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     /**
      * Listener for the Trip document ({@link #mTripRef}).
      */
@@ -161,8 +199,9 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
             Log.w(TAG, "trip:onEvent", e);
             return;
         }
-
-        onTripLoaded(snapshot.toObject(Trip.class));
+        if (snapshot.exists()) {
+            onTripLoaded(snapshot.toObject(Trip.class));
+        }
     }
 
     private void onTripLoaded(Trip trip) {
