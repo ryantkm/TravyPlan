@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <array name="random_images_array">
+        <item>@drawable/cinque_terre</item>
+        <item>@drawable/nepal_1</item>
+        <item>@drawable/nepal_2</item>
+        <item>@drawable/nepal_3</item>
+        <item>@drawable/rice_terrace</item>
+        <item>@drawable/blue_stairs</item>
+        <item>@drawable/roadtripnz</item>
+    </array>
+
+    <array name="transport_icons_array">
+        <item>@drawable/ic_transport_walk</item>
+        <item>@drawable/ic_transport_hike</item>
+        <item>@drawable/ic_transport_bicycle</item>
+        <item>@drawable/ic_transport_motorcycle</item>
+        <item>@drawable/ic_transport_car</item>
+        <item>@drawable/ic_transport_taxi</item>
+        <item>@drawable/ic_transport_van</item>
+        <item>@drawable/ic_transport_campervan</item>
+        <item>@drawable/ic_transport_bus</item>
+        <item>@drawable/ic_transport_tram</item>
+        <item>@drawable/ic_transport_subway</item>
+        <item>@drawable/ic_transport_train</item>
+        <item>@drawable/ic_transport_ferry</item>
+        <item>@drawable/ic_transport_plane</item>
+        <item>@drawable/speedboat</item>
+        <item>@drawable/bus1</item>
+    </array>
+
+    <array name="transport_modes_array">
+        <item>walk</item>
+        <item>hike</item>
+        <item>bicycle</item>
+        <item>motorcycle</item>
+        <item>car</item>
+        <item>taxi</item>
+        <item>van</item>
+        <item>campervan</item>
+        <item>bus</item>
+        <item>tram</item>
+        <item>subway</item>
+        <item>train</item>
+        <item>ferry</item>
+        <item>plane</item>
+        <item>others</item>
+        <item>none</item>
+    </array>
+
+</resources>

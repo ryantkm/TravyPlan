@@ -1,13 +1,14 @@
 package com.eventdee.travyplan.adapter;
 
+import android.content.Context;
+import android.content.res.TypedArray;
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.eventdee.travyplan.R;
 import com.eventdee.travyplan.model.TravyPlace;
@@ -15,22 +16,37 @@ import com.eventdee.travyplan.utils.General;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Query;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class PlaceAdapter extends FirestoreAdapter<PlaceAdapter.ViewHolder> {
 
+    private Context mContext;
+
+    private String[] transportModeArray;
+    private ArrayList<String> transportModeArrayList;
+    private TypedArray transportIconArray;
+
     public interface OnPlaceSelectedListener {
 
         void onPlaceSelected(DocumentSnapshot place);
+
+        void onTransportSelected(DocumentSnapshot place);
 
     }
 
     private OnPlaceSelectedListener mListener;
 
-    public PlaceAdapter(Query query, OnPlaceSelectedListener listener) {
+    public PlaceAdapter(Context mContext, Query query, OnPlaceSelectedListener listener) {
         super(query);
         mListener = listener;
+        // retrieving these arrays so as to know which icon to use for the returned transport mode
+        transportModeArray = mContext.getResources().getStringArray(R.array.transport_modes_array);
+        transportModeArrayList = new ArrayList<String>(Arrays.asList(transportModeArray));
+        transportIconArray = mContext.getResources().obtainTypedArray(R.array.transport_icons_array);
     }
 
     @Override
@@ -44,7 +60,7 @@ public class PlaceAdapter extends FirestoreAdapter<PlaceAdapter.ViewHolder> {
         holder.bind(getSnapshot(position), mListener);
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.tv_place_name)
         TextView tvPlaceName;
@@ -57,8 +73,6 @@ public class PlaceAdapter extends FirestoreAdapter<PlaceAdapter.ViewHolder> {
         View connectedLine;
         @BindView(R.id.iv_transport_icon)
         ImageView ivTransportIcon;
-        @BindView(R.id.iv_empty_transport)
-        ImageButton ivEmptyTransport;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -69,7 +83,8 @@ public class PlaceAdapter extends FirestoreAdapter<PlaceAdapter.ViewHolder> {
                          final OnPlaceSelectedListener listener) {
 
             TravyPlace travyPlace = snapshot.toObject(TravyPlace.class);
-
+            String transportMode = travyPlace.getTransportMode();
+            int indexPosition = transportModeArrayList.indexOf(transportMode);
             // Load image
 //            Glide.with(ivPhoto.getContext())
 //                    .load(trip.getCoverPhoto())
@@ -81,18 +96,16 @@ public class PlaceAdapter extends FirestoreAdapter<PlaceAdapter.ViewHolder> {
             tvPlaceType.setText(travyPlace.getType());
             tvPlaceTime.setText(General.timeFormat.format(travyPlace.getDate()));
 
-            if (travyPlace.getTransportMode() == null) {
-                ivEmptyTransport.setVisibility(View.VISIBLE);
-                ivTransportIcon.setVisibility(View.GONE);
+            if (transportMode == null) {
+                ivTransportIcon.setImageResource(R.drawable.ic_add_circle_outline_24dp);
                 connectedLine.setVisibility(View.GONE);
             } else {
-                ivEmptyTransport.setVisibility(View.GONE);
                 ivTransportIcon.setVisibility(View.VISIBLE);
                 connectedLine.setVisibility(View.VISIBLE);
+                Drawable selectedTransportDrawable = transportIconArray.getDrawable(indexPosition);
+                ivTransportIcon.setImageDrawable(selectedTransportDrawable);
             }
-
             if (getAdapterPosition() == 0) {
-                ivEmptyTransport.setVisibility(View.GONE);
                 ivTransportIcon.setVisibility(View.GONE);
                 connectedLine.setVisibility(View.GONE);
                 setIsRecyclable(false);
@@ -111,14 +124,9 @@ public class PlaceAdapter extends FirestoreAdapter<PlaceAdapter.ViewHolder> {
             ivTransportIcon.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Toast.makeText(ivTransportIcon.getContext(), "show transport dialog " + getAdapterPosition(), Toast.LENGTH_SHORT).show();
-                }
-            });
-
-            ivEmptyTransport.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Toast.makeText(ivEmptyTransport.getContext(), "add transport " + getAdapterPosition(), Toast.LENGTH_SHORT).show();
+                    if (listener != null) {
+                        listener.onTransportSelected(snapshot);
+                    }
                 }
             });
         }

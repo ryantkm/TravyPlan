@@ -164,23 +164,20 @@ public class AddTripActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_update) {
-            addNewTrip();
-        } else if (id == R.id.action_photo) {
-            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-            intent.setType("image/*");
-            intent.addCategory(Intent.CATEGORY_OPENABLE);
-            if (intent.resolveActivity(getPackageManager()) != null) {
-                startActivityForResult(intent, Constants.RC_GET_IMAGE);
-            }
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case R.id.action_update:
+                addNewTrip();
+                return true;
+            case R.id.action_photo:
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("image/*");
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                if (intent.resolveActivity(getPackageManager()) != null) {
+                    startActivityForResult(intent, Constants.RC_GET_IMAGE);
+                }
+                return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -209,6 +206,7 @@ public class AddTripActivity extends AppCompatActivity {
                             intent.putExtra(TripDetailActivity.KEY_TRIP_ID, tripId);
                             startActivity(intent);
                             overridePendingTransition(R.anim.slide_in_from_right, R.anim.slide_out_to_left);
+                            finish();
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {

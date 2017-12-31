@@ -142,34 +142,8 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), AddTripActivity.class);
-//                intent.putExtra(RestaurantDetailActivity.KEY_RESTAURANT_ID, restaurant.getId());
                 startActivity(intent);
                 overridePendingTransition(R.anim.slide_in_from_right, R.anim.slide_out_to_left);
-
-//                final SimpleDateFormat FORMAT  = new SimpleDateFormat(
-//                        "dd/MM/yyyy", Locale.US);
-//
-//                try {
-//                    Trip trip = new Trip("New Zealand", FORMAT.parse("10/01/2018"), FORMAT.parse("21/01/2018"), "https://storage.googleapis.com/firestorequickstarts.appspot.com/food_1.png" );
-//                    mFirestore.collection("trips")
-//                            .add(trip)
-//                            .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-//                                @Override
-//                                public void onSuccess(DocumentReference documentReference) {
-//                                    Log.d(TAG, "DocumentSnapshot written with ID: " + documentReference.getId());
-//                                }
-//                            })
-//                            .addOnFailureListener(new OnFailureListener() {
-//                                @Override
-//                                public void onFailure(@NonNull Exception e) {
-//                                    Log.w(TAG, "Error adding document", e);
-//                                }
-//                            });
-//                } catch (ParseException e) {
-//                    e.printStackTrace();
-//                } catch (java.text.ParseException e) {
-//                    e.printStackTrace();
-//                }
             }
         });
 

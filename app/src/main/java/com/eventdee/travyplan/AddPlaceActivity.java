@@ -207,6 +207,12 @@ public class AddPlaceActivity extends AppCompatActivity implements View.OnClickL
             } else if (datePicker.getText() == "") {
                 Toast.makeText(this, "Please select a date.", Toast.LENGTH_SHORT).show();
             } else {
+
+                if (timePicker.getText() == "") {
+                    calendar.set(Calendar.HOUR_OF_DAY, 0);
+                    calendar.set(Calendar.MINUTE, 0);
+                }
+
                 newTravyPlace = new TravyPlace(calendar.getTime(), "Airport");
                 newTravyPlace.setId(place.getId());
                 newTravyPlace.setPlaceTypes(place.getPlaceTypes());
@@ -226,11 +232,6 @@ public class AddPlaceActivity extends AppCompatActivity implements View.OnClickL
                 newTravyPlace.setPriceLevel(place.getPriceLevel());
                 newTravyPlace.setAttributions((place.getAttributions() != null) ? place.getAttributions().toString():null);
 
-//                if (!mIsEmpty) {
-//                    newTravyPlace.setTransportMode("car");
-////                    newTransport = new Transport(calendar.getTime(), "plane");
-////                    mTripRef.collection("tripitems").add(newTransport);
-//                }
                 mTripRef.collection("tripitems").add(newTravyPlace);
                 Toast.makeText(this, "location added: " + newTravyPlace.getName(), Toast.LENGTH_SHORT).show();
                 finish();
