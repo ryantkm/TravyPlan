@@ -85,6 +85,10 @@ public class PlaceAdapter extends FirestoreAdapter<PlaceAdapter.ViewHolder> {
             TravyPlace travyPlace = snapshot.toObject(TravyPlace.class);
             String transportMode = travyPlace.getTransportMode();
             int indexPosition = transportModeArrayList.indexOf(transportMode);
+
+            if (indexPosition == -1) {
+                indexPosition = transportModeArrayList.indexOf("others");
+            }
             // Load image
 //            Glide.with(ivPhoto.getContext())
 //                    .load(trip.getCoverPhoto())
@@ -97,7 +101,7 @@ public class PlaceAdapter extends FirestoreAdapter<PlaceAdapter.ViewHolder> {
             tvPlaceTime.setText(General.timeFormat.format(travyPlace.getDate()));
 
             if (transportMode == null) {
-                ivTransportIcon.setImageResource(R.drawable.ic_add_circle_outline_24dp);
+                ivTransportIcon.setImageResource(R.drawable.ic_crop_free_46dp);
                 connectedLine.setVisibility(View.GONE);
             } else {
                 ivTransportIcon.setVisibility(View.VISIBLE);

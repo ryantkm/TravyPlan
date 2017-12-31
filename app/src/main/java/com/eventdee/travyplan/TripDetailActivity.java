@@ -51,7 +51,7 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
     TextView tvTripDates;
 
     @BindView(R.id.recycler_trip_items)
-    RecyclerView mTripItemsRecycler;
+    RecyclerView mPlacessRecycler;
 
     @BindView(R.id.view_empty_trip_items)
     ViewGroup mEmptyView;
@@ -104,7 +104,7 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
 
         // Get trip items
         Query itemsQuery = mTripRef
-                .collection("tripitems")
+                .collection("places")
                 .orderBy("date", Query.Direction.DESCENDING);
 
         // RecyclerView
@@ -112,16 +112,16 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
             @Override
             protected void onDataChanged() {
                 if (getItemCount() == 0) {
-                    mTripItemsRecycler.setVisibility(View.GONE);
+                    mPlacessRecycler.setVisibility(View.GONE);
                     mEmptyView.setVisibility(View.VISIBLE);
                 } else {
-                    mTripItemsRecycler.setVisibility(View.VISIBLE);
+                    mPlacessRecycler.setVisibility(View.VISIBLE);
                     mEmptyView.setVisibility(View.GONE);
                 }
             }
         };
-        mTripItemsRecycler.setLayoutManager(new LinearLayoutManager(this));
-        mTripItemsRecycler.setAdapter(mPlaceAdapter);
+        mPlacessRecycler.setLayoutManager(new LinearLayoutManager(this));
+        mPlacessRecycler.setAdapter(mPlaceAdapter);
 
         mTransportDialogFragment = new TransportDialogFragment();
     }
@@ -151,13 +151,6 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
         super.finish();
         overridePendingTransition(R.anim.slide_in_from_left, R.anim.slide_out_to_right);
     }
-
-//    @Override
-//    public void onBackPressed() {
-//        Intent intent=new Intent(this,MainActivity.class);
-//        startActivity(intent);
-//        finish();
-//    }
 
     /**
      * Listener for the Trip document ({@link #mTripRef}).
@@ -198,14 +191,14 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
         mTransportDialogFragment.show(getSupportFragmentManager(), TransportDialogFragment.TAG);
     }
 
-    public void updateTransport(View view) {
+    public void update(View view) {
         View childView = mTransportDialogFragment.mTransportIconsRecycler.findContainingItemView(view);
         int imagePosition = mTransportDialogFragment.mTransportIconsRecycler.getChildAdapterPosition(childView);
         String transportName = getResources().obtainTypedArray(R.array.transport_modes_array).getString(imagePosition);
         if (transportName.equalsIgnoreCase("none")) {
             transportName = null;
         }
-        DocumentReference placeRef = mTripRef.collection("tripitems").document(mPlaceId);
+        DocumentReference placeRef = mTripRef.collection("places").document(mPlaceId);
         placeRef
                 .update("transportMode", transportName)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {

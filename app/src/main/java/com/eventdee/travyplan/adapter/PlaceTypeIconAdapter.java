@@ -11,16 +11,16 @@ import android.widget.TextView;
 
 import com.eventdee.travyplan.R;
 
-public class TransportIconAdapter extends RecyclerView.Adapter<TransportIconAdapter.IconViewHolder> {
+public class PlaceTypeIconAdapter extends RecyclerView.Adapter<PlaceTypeIconAdapter.IconViewHolder> {
 
     private Context mContext;
     private TypedArray mNames;
     private TypedArray mIcons;
 
-    public TransportIconAdapter(Context mContext) {
+    public PlaceTypeIconAdapter(Context mContext) {
         this.mContext = mContext;
-        mNames = mContext.getResources().obtainTypedArray(R.array.transport_modes_array);
-        mIcons = mContext.getResources().obtainTypedArray(R.array.transport_icons_array);
+        mNames = mContext.getResources().obtainTypedArray(R.array.place_types_array);
+        mIcons = mContext.getResources().obtainTypedArray(R.array.place_type_icons_array);
     }
 
     @Override
@@ -31,8 +31,8 @@ public class TransportIconAdapter extends RecyclerView.Adapter<TransportIconAdap
 
     @Override
     public void onBindViewHolder(IconViewHolder holder, int position) {
-        holder.mIvTransportIcon.setImageDrawable(mIcons.getDrawable(position));
-        holder.mTvTransportName.setText(mNames.getString(position));
+        holder.mIvPlaceTypeIcon.setImageDrawable(mIcons.getDrawable(position));
+        holder.mTvPlaceTypeName.setText(mNames.getString(position));
     }
 
     @Override
@@ -42,13 +42,13 @@ public class TransportIconAdapter extends RecyclerView.Adapter<TransportIconAdap
 
     class IconViewHolder extends RecyclerView.ViewHolder {
 
-        ImageView mIvTransportIcon;
-        TextView mTvTransportName;
+        ImageView mIvPlaceTypeIcon;
+        TextView mTvPlaceTypeName;
 
         IconViewHolder(View itemView) {
             super(itemView);
-            mIvTransportIcon = itemView.findViewById(R.id.iv_transport_icon);
-            mTvTransportName = itemView.findViewById(R.id.tv_transport_name);
+            mIvPlaceTypeIcon = itemView.findViewById(R.id.iv_transport_icon);
+            mTvPlaceTypeName = itemView.findViewById(R.id.tv_transport_name);
         }
     }
 }

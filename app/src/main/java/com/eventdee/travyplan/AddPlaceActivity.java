@@ -59,6 +59,8 @@ public class AddPlaceActivity extends AppCompatActivity implements View.OnClickL
     private com.google.android.gms.location.places.Place place;
     private TravyPlace newTravyPlace;
     private Transport newTransport;
+    private PlaceTypeDialogFragment mPlaceTypeDialogFragment;
+    private String mPlaceTypeName;
 
     @BindView(R.id.date_picker)
     Button datePicker;
@@ -116,6 +118,8 @@ public class AddPlaceActivity extends AppCompatActivity implements View.OnClickL
         mDay = calendar.get(Calendar.DAY_OF_MONTH);
         mHour = calendar.get(Calendar.HOUR_OF_DAY);
         mMinute = calendar.get(Calendar.MINUTE);
+
+        mPlaceTypeDialogFragment = new PlaceTypeDialogFragment();
     }
 
     @Override
@@ -196,24 +200,27 @@ public class AddPlaceActivity extends AppCompatActivity implements View.OnClickL
             }
         }
         if (view == placeTypePicker) {
+
+            mPlaceTypeDialogFragment.show(getSupportFragmentManager(), PlaceTypeDialogFragment.TAG);
             // display dialog
         }
 
 
         if (view == btnAdd) {
 
-            if (place == null) {
-                Toast.makeText(this, "Please select a place.", Toast.LENGTH_SHORT).show();
-            } else if (datePicker.getText() == "") {
+            if (datePicker.getText() == "") {
                 Toast.makeText(this, "Please select a date.", Toast.LENGTH_SHORT).show();
+            } else if (place == null) {
+                Toast.makeText(this, "Please select a place.", Toast.LENGTH_SHORT).show();
+            } else if (placeTypePicker.getText() == "") {
+                Toast.makeText(this, "Please select a place type.", Toast.LENGTH_SHORT).show();
             } else {
-
                 if (timePicker.getText() == "") {
                     calendar.set(Calendar.HOUR_OF_DAY, 0);
                     calendar.set(Calendar.MINUTE, 0);
                 }
 
-                newTravyPlace = new TravyPlace(calendar.getTime(), "Airport");
+                newTravyPlace = new TravyPlace(calendar.getTime(), mPlaceTypeName);
                 newTravyPlace.setId(place.getId());
                 newTravyPlace.setPlaceTypes(place.getPlaceTypes());
                 newTravyPlace.setAddress((place.getAddress() != null) ? place.getAddress().toString():null);
@@ -232,7 +239,7 @@ public class AddPlaceActivity extends AppCompatActivity implements View.OnClickL
                 newTravyPlace.setPriceLevel(place.getPriceLevel());
                 newTravyPlace.setAttributions((place.getAttributions() != null) ? place.getAttributions().toString():null);
 
-                mTripRef.collection("tripitems").add(newTravyPlace);
+                mTripRef.collection("places").add(newTravyPlace);
                 Toast.makeText(this, "location added: " + newTravyPlace.getName(), Toast.LENGTH_SHORT).show();
                 finish();
             }
@@ -248,10 +255,19 @@ public class AddPlaceActivity extends AppCompatActivity implements View.OnClickL
         if (requestCode == Constants.RC_PLACE_PICKER) {
             if (resultCode == RESULT_OK) {
                 place = PlacePicker.getPlace(this, data);
-                String toastMsg = String.format("GooglePlace: %s", place.getName());
-                placePicker.setText(toastMsg);
+//                String toastMsg = String.format("GooglePlace: %s", place.getName());
+                placePicker.setText(place.getName());
                 placePicker.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
             }
         }
+    }
+
+    public void update(View view) {
+        View childView = mPlaceTypeDialogFragment.mTransportIconsRecycler.findContainingItemView(view);
+        int imagePosition = mPlaceTypeDialogFragment.mTransportIconsRecycler.getChildAdapterPosition(childView);
+        mPlaceTypeName = getResources().obtainTypedArray(R.array.place_types_array).getString(imagePosition);
+        placeTypePicker.setText(mPlaceTypeName);
+        placeTypePicker.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+        mPlaceTypeDialogFragment.dismiss();
     }
 }
