@@ -1,6 +1,8 @@
 package com.eventdee.travyplan;
 
 import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -8,6 +10,7 @@ import android.net.ParseException;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -66,6 +69,12 @@ public class AddTripActivity extends AppCompatActivity {
 
     private FirebaseFirestore mFirestore;
 
+    // firebase storage
+    private Uri mDownloadUrl = null;
+    private Uri mFileUri = null;
+    private BroadcastReceiver mBroadcastReceiver;
+    private ProgressDialog mProgressDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -117,6 +126,38 @@ public class AddTripActivity extends AppCompatActivity {
                 .apply(new RequestOptions()
                         .centerCrop())
                 .into(ivTripPhoto);
+
+        // Local broadcast receiver
+        mBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.d(TAG, "onReceive:" + intent);
+                hideProgressDialog();
+
+                switch (intent.getAction()) {
+//                    case MyDownloadService.DOWNLOAD_COMPLETED:
+//                        // Get number of bytes downloaded
+//                        long numBytes = intent.getLongExtra(MyDownloadService.EXTRA_BYTES_DOWNLOADED, 0);
+//
+//                        // Alert success
+//                        showMessageDialog(getString(R.string.success), String.format(Locale.getDefault(),
+//                                "%d bytes downloaded from %s",
+//                                numBytes,
+//                                intent.getStringExtra(MyDownloadService.EXTRA_DOWNLOAD_PATH)));
+//                        break;
+//                    case MyDownloadService.DOWNLOAD_ERROR:
+//                        // Alert failure
+//                        showMessageDialog("Error", String.format(Locale.getDefault(),
+//                                "Failed to download from %s",
+//                                intent.getStringExtra(MyDownloadService.EXTRA_DOWNLOAD_PATH)));
+//                        break;
+                    case MyUploadService.UPLOAD_COMPLETED:
+                    case MyUploadService.UPLOAD_ERROR:
+                        onUploadResultIntent(intent);
+                        break;
+                }
+            }
+        };
     }
 
     @Override
@@ -189,7 +230,7 @@ public class AddTripActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             // Respond to the action bar's Up/Home button
             case R.id.action_update:
-                addNewTrip();
+                uploadFromUri(mPhotoUri);
                 return true;
             case R.id.action_photo:
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -213,6 +254,7 @@ public class AddTripActivity extends AppCompatActivity {
         } else {
             mTripName = etTripName.getText().toString().trim();
         }
+
         mNewTrip = new Trip(mTripName, mStartDate.getTime(), mEndDate.getTime(), mPhotoUri.toString());
 
         if (mSource.equalsIgnoreCase("MainActivity")) {
@@ -248,10 +290,6 @@ public class AddTripActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(Void aVoid) {
                             Log.d(TAG, "DocumentSnapshot successfully written!");
-                            Intent intent = new Intent(getApplicationContext(), TripDetailActivity.class);
-                            intent.putExtra(TripDetailActivity.KEY_TRIP_ID, mEditTripId);
-                            startActivity(intent);
-                            overridePendingTransition(R.anim.slide_in_from_right, R.anim.slide_out_to_left);
                             finish();
                         }
                     })
@@ -261,6 +299,67 @@ public class AddTripActivity extends AppCompatActivity {
                             Log.w(TAG, "Error writing document", e);
                         }
                     });
+        }
+    }
+
+    private void uploadFromUri(Uri fileUri) {
+        Log.d(TAG, "uploadFromUri:src:" + fileUri.toString());
+
+        // Save the File URI
+        mFileUri = fileUri;
+
+        // Clear the last download, if any
+        mDownloadUrl = null;
+
+        // Start MyUploadService to upload the file, so that the file is uploaded
+        // even if this Activity is killed or put in the background
+        startService(new Intent(this, MyUploadService.class)
+                .putExtra(MyUploadService.EXTRA_FILE_URI, fileUri)
+                .setAction(MyUploadService.ACTION_UPLOAD));
+
+        // Show loading spinner
+        showProgressDialog(getString(R.string.progress_uploading));
+    }
+
+    private void onUploadResultIntent(Intent intent) {
+        // Got a new intent from MyUploadService with a success or failure
+        mPhotoUri = intent.getParcelableExtra(MyUploadService.EXTRA_DOWNLOAD_URL);
+        mFileUri = intent.getParcelableExtra(MyUploadService.EXTRA_FILE_URI);
+
+        addNewTrip();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        // Register receiver for uploads and downloads
+        LocalBroadcastManager manager = LocalBroadcastManager.getInstance(this);
+//        manager.registerReceiver(mBroadcastReceiver, MyDownloadService.getIntentFilter());
+        manager.registerReceiver(mBroadcastReceiver, MyUploadService.getIntentFilter());
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // Unregister download receiver
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver);
+    }
+
+    private void showProgressDialog(String caption) {
+        if (mProgressDialog == null) {
+            mProgressDialog = new ProgressDialog(this);
+            mProgressDialog.setIndeterminate(true);
+        }
+
+        mProgressDialog.setMessage(caption);
+        mProgressDialog.show();
+    }
+
+    private void hideProgressDialog() {
+        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+            mProgressDialog.dismiss();
         }
     }
 }
