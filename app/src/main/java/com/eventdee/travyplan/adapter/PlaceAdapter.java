@@ -3,8 +3,10 @@ package com.eventdee.travyplan.adapter;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -36,6 +38,7 @@ public class PlaceAdapter extends FirestoreAdapter<PlaceAdapter.ViewHolder> {
 
         void onTransportSelected(DocumentSnapshot place);
 
+        void onOptionSelected (DocumentSnapshot place, MenuItem item);
     }
 
     private OnPlaceSelectedListener mListener;
@@ -70,6 +73,9 @@ public class PlaceAdapter extends FirestoreAdapter<PlaceAdapter.ViewHolder> {
         TextView tvPlaceTime;
         @BindView(R.id.tv_place_date)
         TextView tvPlaceDate;
+
+        @BindView(R.id.iv_more)
+        ImageView ivMoreOptions;
 
         @BindView(R.id.connected_line)
         View connectedLine;
@@ -133,6 +139,29 @@ public class PlaceAdapter extends FirestoreAdapter<PlaceAdapter.ViewHolder> {
                 public void onClick(View view) {
                     if (listener != null) {
                         listener.onTransportSelected(snapshot);
+                    }
+                }
+            });
+
+            ivMoreOptions.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (listener != null) {
+                        //Creating the instance of PopupMenu
+                        PopupMenu popup = new PopupMenu(ivMoreOptions.getContext(),ivMoreOptions);
+                        //Inflating the Popup using xml file
+                        popup.getMenuInflater()
+                                .inflate(R.menu.menu_pop_up_more, popup.getMenu());
+
+                        //registering popup with OnMenuItemClickListener
+                        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                            public boolean onMenuItemClick(MenuItem item) {
+                                listener.onOptionSelected(snapshot, item);
+                                return true;
+                            }
+                        });
+
+                        popup.show(); //showing popup menu
                     }
                 }
             });

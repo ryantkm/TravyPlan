@@ -49,16 +49,12 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
 
     @BindView(R.id.iv_trip_photo)
     ImageView ivTripPhoto;
-
     @BindView(R.id.tv_trip_dates)
     TextView tvTripDates;
-
     @BindView(R.id.recycler_trip_items)
     RecyclerView mPlacessRecycler;
-
     @BindView(R.id.view_empty_trip_items)
     ViewGroup mEmptyView;
-
     @BindView(R.id.collapsing_toolbar)
     CollapsingToolbarLayout mCollapsingToolbar;
 
@@ -234,6 +230,20 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
     public void onTransportSelected(DocumentSnapshot place) {
         mPlaceId = place.getId();
         mTransportDialogFragment.show(getSupportFragmentManager(), TransportDialogFragment.TAG);
+    }
+
+    @Override
+    public void onOptionSelected(DocumentSnapshot place, MenuItem item) {
+        mPlaceId = place.getId();
+        switch (item.getItemId()){
+            case R.id.action_delete_place:
+                //TODO: delete place
+                break;
+            case R.id.action_add_photos:
+                //TODO: add photos
+                break;
+        }
+        Toast.makeText(this, "You Clicked : " + item.getTitle(), Toast.LENGTH_SHORT).show();
     }
 
     public void update(View view) {
