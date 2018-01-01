@@ -14,7 +14,6 @@ import android.widget.DatePicker;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import com.eventdee.travyplan.model.Transport;
 import com.eventdee.travyplan.model.TravyPlace;
 import com.eventdee.travyplan.utils.Constants;
 import com.eventdee.travyplan.utils.General;
@@ -58,7 +57,6 @@ public class AddPlaceActivity extends AppCompatActivity implements View.OnClickL
 
     private com.google.android.gms.location.places.Place place;
     private TravyPlace newTravyPlace;
-    private Transport newTransport;
     private PlaceTypeDialogFragment mPlaceTypeDialogFragment;
     private String mPlaceTypeName;
 

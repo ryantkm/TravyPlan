@@ -25,6 +25,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.eventdee.travyplan.model.Trip;
+import com.eventdee.travyplan.service.MyUploadService;
 import com.eventdee.travyplan.utils.Constants;
 import com.eventdee.travyplan.utils.General;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -230,6 +231,15 @@ public class AddTripActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             // Respond to the action bar's Up/Home button
             case R.id.action_update:
+                mTripName = etTripName.getText().toString().trim();
+                if (mTripName == null || mTripName.equalsIgnoreCase("")) {
+                    mTripName = "Trip #" + Constants.TRIP_NUMBER;
+                    Constants.TRIP_NUMBER += 1;
+                    editor.putInt("key_trip_number", Constants.TRIP_NUMBER);
+                    editor.commit();
+                } else {
+                    mTripName = etTripName.getText().toString().trim();
+                }
                 uploadFromUri(mPhotoUri);
                 return true;
             case R.id.action_photo:
@@ -245,16 +255,6 @@ public class AddTripActivity extends AppCompatActivity {
     }
 
     private void addNewTrip() {
-        mTripName = etTripName.getText().toString().trim();
-        if (mTripName == null || mTripName.equalsIgnoreCase("")) {
-            mTripName = "Trip #" + Constants.TRIP_NUMBER;
-            Constants.TRIP_NUMBER += 1;
-            editor.putInt("key_trip_number", Constants.TRIP_NUMBER);
-            editor.commit();
-        } else {
-            mTripName = etTripName.getText().toString().trim();
-        }
-
         mNewTrip = new Trip(mTripName, mStartDate.getTime(), mEndDate.getTime(), mPhotoUri.toString());
 
         if (mSource.equalsIgnoreCase("MainActivity")) {

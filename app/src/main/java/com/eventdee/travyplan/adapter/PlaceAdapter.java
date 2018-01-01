@@ -68,6 +68,8 @@ public class PlaceAdapter extends FirestoreAdapter<PlaceAdapter.ViewHolder> {
         TextView tvPlaceType;
         @BindView(R.id.tv_place_time)
         TextView tvPlaceTime;
+        @BindView(R.id.tv_place_date)
+        TextView tvPlaceDate;
 
         @BindView(R.id.connected_line)
         View connectedLine;
@@ -99,6 +101,7 @@ public class PlaceAdapter extends FirestoreAdapter<PlaceAdapter.ViewHolder> {
             tvPlaceName.setText(travyPlace.getName());
             tvPlaceType.setText(travyPlace.getType());
             tvPlaceTime.setText(General.timeFormat.format(travyPlace.getDate()));
+            tvPlaceDate.setText(General.dateFormatPlace.format(travyPlace.getDate()));
 
             if (transportMode == null) {
                 ivTransportIcon.setImageResource(R.drawable.ic_crop_free_46dp);

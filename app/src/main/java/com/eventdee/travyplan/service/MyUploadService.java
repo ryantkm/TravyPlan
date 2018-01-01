@@ -1,4 +1,4 @@
-package com.eventdee.travyplan;
+package com.eventdee.travyplan.service;
 
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -9,6 +9,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.eventdee.travyplan.MainActivity;
+import com.eventdee.travyplan.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
