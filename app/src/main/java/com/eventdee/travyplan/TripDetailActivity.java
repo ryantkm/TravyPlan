@@ -41,10 +41,11 @@ import butterknife.ButterKnife;
 
 public class TripDetailActivity extends AppCompatActivity implements EventListener<DocumentSnapshot>, PlaceAdapter.OnPlaceSelectedListener {
 
-    private static final String TAG = TripDetailActivity.class.getSimpleName();
+    public static final String TAG = TripDetailActivity.class.getSimpleName();
     public static final String KEY_TRIP_ID = "key_trip_id";
     private String mTripId;
     private String mPlaceId;
+    private Trip mTrip;
 
     @BindView(R.id.iv_trip_photo)
     ImageView ivTripPhoto;
@@ -166,7 +167,11 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
         switch (item.getItemId()) {
             // Respond to the action bar's Up/Home button
             case R.id.action_edit_cover:
-                Toast.makeText(this, "edit cover/info", Toast.LENGTH_SHORT).show();
+                Intent editIntent = new Intent(this, AddTripActivity.class);
+                editIntent.putExtra("trip", mTrip);
+                editIntent.putExtra(KEY_TRIP_ID, mTripId);
+                editIntent.putExtra("tag", TAG);
+                startActivity(editIntent);
                 return true;
             case R.id.action_delete_trip:
                 mTripRef
@@ -205,6 +210,7 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
     }
 
     private void onTripLoaded(Trip trip) {
+        mTrip = trip;
         // Load image
         Glide.with(ivTripPhoto.getContext())
                 .load(trip.getCoverPhoto())

@@ -42,14 +42,12 @@ import butterknife.ButterKnife;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, TripAdapter.OnTripSelectedListener {
 
-    private static final String TAG = MainActivity.class.getSimpleName();
+    public static final String TAG = MainActivity.class.getSimpleName();
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
-
     @BindView(R.id.recycler_trips)
     RecyclerView mTripsRecycler;
-
     @BindView(R.id.view_empty_main)
     ViewGroup mEmptyView;
 
@@ -142,6 +140,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), AddTripActivity.class);
+                intent.putExtra("tag", TAG);
                 startActivity(intent);
                 overridePendingTransition(R.anim.slide_in_from_right, R.anim.slide_out_to_left);
             }
@@ -245,10 +244,9 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onTripSelected(DocumentSnapshot trip) {
-        Intent intent = new Intent(getApplicationContext(), TripDetailActivity.class);
+        Intent intent = new Intent(this, TripDetailActivity.class);
         intent.putExtra(TripDetailActivity.KEY_TRIP_ID, trip.getId());
         startActivity(intent);
-
     }
 
     @Override

@@ -21,9 +21,7 @@ import butterknife.ButterKnife;
 public class TripAdapter extends FirestoreAdapter<TripAdapter.ViewHolder> {
 
     public interface OnTripSelectedListener {
-
         void onTripSelected(DocumentSnapshot trip);
-
     }
 
     private OnTripSelectedListener mListener;

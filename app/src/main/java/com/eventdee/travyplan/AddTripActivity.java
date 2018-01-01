@@ -57,6 +57,9 @@ public class AddTripActivity extends AppCompatActivity {
     private Uri mPhotoUri;
     private String mTripName;
     private Trip mNewTrip;
+    private Trip mEditTrip;
+    private String mEditTripId;
+    private String mSource;
 
     SharedPreferences sharedPref;
     SharedPreferences.Editor editor;
@@ -81,6 +84,14 @@ public class AddTripActivity extends AppCompatActivity {
         // Firestore
         mFirestore = FirebaseFirestore.getInstance();
 
+        Intent intent = getIntent();
+        mSource = intent.getStringExtra("tag");
+
+        if (mSource.equalsIgnoreCase("TripDetailActivity")) {
+            mEditTrip = intent.getParcelableExtra("trip");
+            mEditTripId = intent.getStringExtra(TripDetailActivity.KEY_TRIP_ID);
+        }
+
         etTripName.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
@@ -92,15 +103,20 @@ public class AddTripActivity extends AppCompatActivity {
             }
         });
 
-        mPhotoUri = General.getRandomDrawableUrl(this);
-
+        if (mSource.equalsIgnoreCase("MainActivity")) {
+            mPhotoUri = General.getRandomDrawableUrl(this);
+            tvStartDate.setText(General.dateFormat.format(mCurrentDate.getTimeInMillis()));
+        } else if (mSource.equalsIgnoreCase("TripDetailActivity")){
+            mPhotoUri = Uri.parse(mEditTrip.getCoverPhoto());
+            etTripName.setText(mEditTrip.getName());
+            tvStartDate.setText(General.dateFormat.format(mEditTrip.getStartDate().getTime()));
+            tvEndDate.setText(General.dateFormat.format(mEditTrip.getEndDate().getTime()));
+        }
         Glide.with(ivTripPhoto.getContext())
                 .load(mPhotoUri)
                 .apply(new RequestOptions()
                         .centerCrop())
                 .into(ivTripPhoto);
-
-        tvStartDate.setText(General.dateFormat.format(mCurrentDate.getTimeInMillis()));
     }
 
     @Override
@@ -119,13 +135,19 @@ public class AddTripActivity extends AppCompatActivity {
 
     public void selectDate(final View v) {
         if (v == tvStartDate) {
+            if (mSource.equalsIgnoreCase("TripDetailActivity")) {
+                mStartDate.setTime(mEditTrip.getStartDate());
+            }
             mYear = mStartDate.get(Calendar.YEAR);
             mMonth = mStartDate.get(Calendar.MONTH);
             mDay = mStartDate.get(Calendar.DAY_OF_MONTH);
         } else {
-            mYear = mEndDate.get(Calendar.YEAR);
-            mMonth = mEndDate.get(Calendar.MONTH);
-            mDay = mEndDate.get(Calendar.DAY_OF_MONTH);
+            if (mSource.equalsIgnoreCase("TripDetailActivity")) {
+                mEndDate.setTime(mEditTrip.getEndDate());
+            }
+            mYear = mStartDate.get(Calendar.YEAR);
+            mMonth = mStartDate.get(Calendar.MONTH);
+            mDay = mStartDate.get(Calendar.DAY_OF_MONTH);
         }
         DatePickerDialog datePickerDialog = new DatePickerDialog(this,
                 new DatePickerDialog.OnDateSetListener() {
@@ -193,17 +215,41 @@ public class AddTripActivity extends AppCompatActivity {
         }
         mNewTrip = new Trip(mTripName, mStartDate.getTime(), mEndDate.getTime(), mPhotoUri.toString());
 
-        try {
-            mFirestore.collection("trips")
-                    .add(mNewTrip)
-                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+        if (mSource.equalsIgnoreCase("MainActivity")) {
+            try {
+                mFirestore.collection("trips")
+                        .add(mNewTrip)
+                        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                            @Override
+                            public void onSuccess(DocumentReference documentReference) {
+                                String tripId = documentReference.getId();
+                                Log.d(TAG, "DocumentSnapshot written with ID: " + tripId);
+                                // Go to the details page for adding details
+                                Intent intent = new Intent(getApplicationContext(), TripDetailActivity.class);
+                                intent.putExtra(TripDetailActivity.KEY_TRIP_ID, tripId);
+                                startActivity(intent);
+                                overridePendingTransition(R.anim.slide_in_from_right, R.anim.slide_out_to_left);
+                                finish();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.w(TAG, "Error adding document", e);
+                            }
+                        });
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        } else {
+            mFirestore.collection("trips").document(mEditTripId)
+                    .set(mNewTrip)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
-                        public void onSuccess(DocumentReference documentReference) {
-                            String tripId = documentReference.getId();
-                            Log.d(TAG, "DocumentSnapshot written with ID: " + tripId);
-                            // Go to the details page for adding details
+                        public void onSuccess(Void aVoid) {
+                            Log.d(TAG, "DocumentSnapshot successfully written!");
                             Intent intent = new Intent(getApplicationContext(), TripDetailActivity.class);
-                            intent.putExtra(TripDetailActivity.KEY_TRIP_ID, tripId);
+                            intent.putExtra(TripDetailActivity.KEY_TRIP_ID, mEditTripId);
                             startActivity(intent);
                             overridePendingTransition(R.anim.slide_in_from_right, R.anim.slide_out_to_left);
                             finish();
@@ -212,11 +258,9 @@ public class AddTripActivity extends AppCompatActivity {
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Log.w(TAG, "Error adding document", e);
+                            Log.w(TAG, "Error writing document", e);
                         }
                     });
-        } catch (ParseException e) {
-            e.printStackTrace();
         }
     }
 }
