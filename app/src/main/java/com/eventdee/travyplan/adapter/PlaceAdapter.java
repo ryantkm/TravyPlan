@@ -38,7 +38,7 @@ public class PlaceAdapter extends FirestoreAdapter<PlaceAdapter.ViewHolder> {
 
         void onTransportSelected(DocumentSnapshot place);
 
-        void onOptionSelected (DocumentSnapshot place, MenuItem item);
+        void onOptionSelected (DocumentSnapshot place, MenuItem item, int position);
     }
 
     private OnPlaceSelectedListener mListener;
@@ -156,11 +156,10 @@ public class PlaceAdapter extends FirestoreAdapter<PlaceAdapter.ViewHolder> {
                         //registering popup with OnMenuItemClickListener
                         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                             public boolean onMenuItemClick(MenuItem item) {
-                                listener.onOptionSelected(snapshot, item);
+                                listener.onOptionSelected(snapshot, item, getAdapterPosition());
                                 return true;
                             }
                         });
-
                         popup.show(); //showing popup menu
                     }
                 }

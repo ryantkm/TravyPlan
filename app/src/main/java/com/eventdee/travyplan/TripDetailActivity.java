@@ -104,7 +104,7 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
         // Get trip items
         Query itemsQuery = mTripRef
                 .collection("places")
-                .orderBy("date", Query.Direction.DESCENDING);
+                .orderBy("date", Query.Direction.ASCENDING);
 
         // RecyclerView
         mPlaceAdapter = new PlaceAdapter(this, itemsQuery, this) {
@@ -233,17 +233,35 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
     }
 
     @Override
-    public void onOptionSelected(DocumentSnapshot place, MenuItem item) {
+    public void onOptionSelected(final DocumentSnapshot place, MenuItem item, final int position) {
         mPlaceId = place.getId();
         switch (item.getItemId()){
             case R.id.action_delete_place:
-                //TODO: delete place
+                mTripRef.collection("places").document(mPlaceId)
+                        .delete()
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Log.d(TAG, "Trip successfully deleted!");
+                                Toast.makeText(TripDetailActivity.this, place.getString("name") + " deleted!", Toast.LENGTH_SHORT).show();
+                                if (position == 0) {
+                                    mPlacessRecycler.setAdapter(mPlaceAdapter);
+//                                    mPlaceAdapter.notifyItemChanged(0);
+                                }
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.w(TAG, "Error deleting document", e);
+                            }
+                        });
                 break;
             case R.id.action_add_photos:
                 //TODO: add photos
+                Toast.makeText(this, "You Clicked : " + item.getTitle(), Toast.LENGTH_SHORT).show();
                 break;
         }
-        Toast.makeText(this, "You Clicked : " + item.getTitle(), Toast.LENGTH_SHORT).show();
     }
 
     public void update(View view) {
