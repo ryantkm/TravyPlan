@@ -1,5 +1,6 @@
 package com.eventdee.travyplan;
 
+import android.content.ClipData;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -34,7 +35,10 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -67,6 +71,8 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
     private TransportDialogFragment mTransportDialogFragment;
 
     private Date mStartDate, mEndDate;
+
+    private ArrayList<String> mPhotosArray = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -235,7 +241,7 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
     @Override
     public void onOptionSelected(final DocumentSnapshot place, MenuItem item, final int position) {
         mPlaceId = place.getId();
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.action_delete_place:
                 mTripRef.collection("places").document(mPlaceId)
                         .delete()
@@ -247,6 +253,7 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
                                 if (position == 0) {
                                     mPlacessRecycler.setAdapter(mPlaceAdapter);
 //                                    mPlaceAdapter.notifyItemChanged(0);
+                                    //TODO: need to refactor as removal animation is not smooth
                                 }
                             }
                         })
@@ -258,8 +265,14 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
                         });
                 break;
             case R.id.action_add_photos:
-                //TODO: add photos
-                Toast.makeText(this, "You Clicked : " + item.getTitle(), Toast.LENGTH_SHORT).show();
+                mPlaceId = place.getId();
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("image/*");
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                if (intent.resolveActivity(getPackageManager()) != null) {
+                    startActivityForResult(intent, Constants.RC_GET_IMAGE);
+                }
                 break;
         }
     }
@@ -287,5 +300,49 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
                     }
                 });
         mTransportDialogFragment.dismiss();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == Constants.RC_GET_IMAGE && resultCode == RESULT_OK && data != null) {
+            mPhotosArray.clear();
+            if (data.getClipData() != null) {
+                ClipData clipData = data.getClipData();
+                for (int i = 0; i < clipData.getItemCount(); i++) {
+                    ClipData.Item item = clipData.getItemAt(i);
+                    String photoUri = item.getUri().toString();
+                    Map<String, Object> photo = new HashMap<>();
+                    photo.put("photo", photoUri);
+                    mTripRef.collection("places").document(mPlaceId).collection("photos").add(photo)
+                            .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                @Override
+                                public void onSuccess(DocumentReference documentReference) {
+                                    Log.d(TAG, "DocumentSnapshot written with ID: " + documentReference.getId());
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.w(TAG, "Error adding document", e);
+                        }
+                    });
+                }
+            } else if (data.getData() != null) {
+                String photoUri = data.getData().toString();
+                Map<String, Object> photo = new HashMap<>();
+                photo.put("photo", photoUri);
+                mTripRef.collection("places").document(mPlaceId).collection("photos").add(photo)
+                        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                            @Override
+                            public void onSuccess(DocumentReference documentReference) {
+                                Log.d(TAG, "DocumentSnapshot written with ID: " + documentReference.getId());
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error adding document", e);
+                    }
+                });
+            }
+        }
     }
 }
