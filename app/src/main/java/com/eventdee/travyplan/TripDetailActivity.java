@@ -22,6 +22,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.eventdee.travyplan.adapter.PlaceAdapter;
+import com.eventdee.travyplan.model.TravyPlace;
 import com.eventdee.travyplan.model.Trip;
 import com.eventdee.travyplan.utils.Constants;
 import com.eventdee.travyplan.utils.General;
@@ -238,6 +239,10 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
     @Override
     public void onOptionSelected(final DocumentSnapshot place, MenuItem item, final int position) {
         mPlaceId = place.getId();
+        TravyPlace travyPlace = place.toObject(TravyPlace.class);
+        if (travyPlace.getPhotos() != null) {
+            mPhotosArray = travyPlace.getPhotos();
+        }
         switch (item.getItemId()) {
             case R.id.action_delete_place:
                 mTripRef.collection("places").document(mPlaceId)
@@ -302,7 +307,6 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == Constants.RC_GET_IMAGE && resultCode == RESULT_OK && data != null) {
-            mPhotosArray.clear();
             if (data.getClipData() != null) {
                 ClipData clipData = data.getClipData();
                 for (int i = 0; i < clipData.getItemCount(); i++) {
@@ -313,20 +317,6 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
             } else if (data.getData() != null) {
                 String photoUri = data.getData().toString();
                 mPhotosArray.add(photoUri);
-//                Map<String, Object> photo = new HashMap<>();
-//                photo.put("photo", photoUri);
-//                mTripRef.collection("places").document(mPlaceId).collection("photos").add(photo)
-//                        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-//                            @Override
-//                            public void onSuccess(DocumentReference documentReference) {
-//                                Log.d(TAG, "DocumentSnapshot written with ID: " + documentReference.getId());
-//                            }
-//                        }).addOnFailureListener(new OnFailureListener() {
-//                    @Override
-//                    public void onFailure(@NonNull Exception e) {
-//                        Log.w(TAG, "Error adding document", e);
-//                    }
-//                });
             }
             mTripRef.collection("places").document(mPlaceId).update("photos", mPhotosArray)
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
