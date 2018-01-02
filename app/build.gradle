@@ -70,6 +70,9 @@ dependencies {
     implementation "android.arch.lifecycle:runtime:1.0.3"
     implementation "android.arch.lifecycle:extensions:1.0.0"
     annotationProcessor "android.arch.lifecycle:compiler:1.0.0"
+
+    // banner slides for photos
+    implementation 'com.ss.bannerslider:bannerslider:1.8.0'
 }
 
 

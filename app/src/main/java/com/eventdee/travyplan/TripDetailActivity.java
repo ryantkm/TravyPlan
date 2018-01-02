@@ -37,8 +37,6 @@ import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -311,38 +309,39 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
                 for (int i = 0; i < clipData.getItemCount(); i++) {
                     ClipData.Item item = clipData.getItemAt(i);
                     String photoUri = item.getUri().toString();
-                    Map<String, Object> photo = new HashMap<>();
-                    photo.put("photo", photoUri);
-                    mTripRef.collection("places").document(mPlaceId).collection("photos").add(photo)
-                            .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                @Override
-                                public void onSuccess(DocumentReference documentReference) {
-                                    Log.d(TAG, "DocumentSnapshot written with ID: " + documentReference.getId());
-                                }
-                            }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.w(TAG, "Error adding document", e);
-                        }
-                    });
+                    mPhotosArray.add(photoUri);
                 }
             } else if (data.getData() != null) {
                 String photoUri = data.getData().toString();
-                Map<String, Object> photo = new HashMap<>();
-                photo.put("photo", photoUri);
-                mTripRef.collection("places").document(mPlaceId).collection("photos").add(photo)
-                        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                            @Override
-                            public void onSuccess(DocumentReference documentReference) {
-                                Log.d(TAG, "DocumentSnapshot written with ID: " + documentReference.getId());
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error adding document", e);
-                    }
-                });
+                mPhotosArray.add(photoUri);
+//                Map<String, Object> photo = new HashMap<>();
+//                photo.put("photo", photoUri);
+//                mTripRef.collection("places").document(mPlaceId).collection("photos").add(photo)
+//                        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+//                            @Override
+//                            public void onSuccess(DocumentReference documentReference) {
+//                                Log.d(TAG, "DocumentSnapshot written with ID: " + documentReference.getId());
+//                            }
+//                        }).addOnFailureListener(new OnFailureListener() {
+//                    @Override
+//                    public void onFailure(@NonNull Exception e) {
+//                        Log.w(TAG, "Error adding document", e);
+//                    }
+//                });
             }
+            mTripRef.collection("places").document(mPlaceId).update("photos", mPhotosArray)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d(TAG, "DocumentSnapshot successfully updated!");
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.w(TAG, "Error updating document", e);
+                        }
+                    });
         }
     }
 }

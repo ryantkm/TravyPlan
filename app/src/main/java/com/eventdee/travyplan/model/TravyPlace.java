@@ -2,6 +2,7 @@ package com.eventdee.travyplan.model;
 
 import com.google.firebase.firestore.GeoPoint;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -9,7 +10,6 @@ public class TravyPlace {
 
     private Date date;
     private String type;
-    private String itemType;
     private String id;
     private List<Integer> placeTypes;
     private String address;
@@ -26,6 +26,7 @@ public class TravyPlace {
     private int priceLevel;
     private String attributions;
     private String transportMode;
+    private ArrayList<String> photos;
 
     public TravyPlace() {
     }
@@ -33,7 +34,6 @@ public class TravyPlace {
     public TravyPlace(Date date, String type) {
         this.date = date;
         this.type = type;
-        itemType = "place";
     }
 
     public Date getDate() {
@@ -50,14 +50,6 @@ public class TravyPlace {
 
     public void setType(String type) {
         this.type = type;
-    }
-
-    public String getItemType() {
-        return itemType;
-    }
-
-    public void setItemType(String itemType) {
-        this.itemType = itemType;
     }
 
     public String getId() {
@@ -178,5 +170,13 @@ public class TravyPlace {
 
     public void setTransportMode(String transportMode) {
         this.transportMode = transportMode;
+    }
+
+    public ArrayList<String> getPhotos() {
+        return photos;
+    }
+
+    public void setPhotos(ArrayList<String> photos) {
+        this.photos = photos;
     }
 }

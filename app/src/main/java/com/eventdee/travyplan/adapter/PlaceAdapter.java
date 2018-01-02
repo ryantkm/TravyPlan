@@ -20,9 +20,13 @@ import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import ss.com.bannerslider.banners.Banner;
+import ss.com.bannerslider.banners.RemoteBanner;
+import ss.com.bannerslider.views.BannerSlider;
 
 public class PlaceAdapter extends FirestoreAdapter<PlaceAdapter.ViewHolder> {
 
@@ -45,6 +49,7 @@ public class PlaceAdapter extends FirestoreAdapter<PlaceAdapter.ViewHolder> {
 
     public PlaceAdapter(Context mContext, Query query, OnPlaceSelectedListener listener) {
         super(query);
+        this.mContext = mContext;
         mListener = listener;
         // retrieving these arrays so as to know which icon to use for the returned transport mode
         transportModeArray = mContext.getResources().getStringArray(R.array.transport_modes_array);
@@ -82,6 +87,9 @@ public class PlaceAdapter extends FirestoreAdapter<PlaceAdapter.ViewHolder> {
         @BindView(R.id.iv_transport_icon)
         ImageView ivTransportIcon;
 
+        @BindView(R.id.banner_slider)
+        BannerSlider mBannerSlider;
+
         public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
@@ -108,6 +116,17 @@ public class PlaceAdapter extends FirestoreAdapter<PlaceAdapter.ViewHolder> {
             tvPlaceType.setText(travyPlace.getType());
             tvPlaceTime.setText(General.timeFormat.format(travyPlace.getDate()));
             tvPlaceDate.setText(General.dateFormatPlace.format(travyPlace.getDate()));
+
+            if (travyPlace.getPhotos() != null) {
+                mBannerSlider.setVisibility(View.VISIBLE);
+                List<Banner> banners = new ArrayList<>();
+                for (int i = 0; i < travyPlace.getPhotos().size(); i++) {
+                    banners.add(new RemoteBanner(travyPlace.getPhotos().get(i)));
+                }
+                mBannerSlider.setBanners(banners);
+            } else {
+                mBannerSlider.setVisibility(View.GONE);
+            }
 
             if (transportMode == null) {
                 ivTransportIcon.setImageResource(R.drawable.ic_crop_free_46dp);
