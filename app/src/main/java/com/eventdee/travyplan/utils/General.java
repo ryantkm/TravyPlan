@@ -6,6 +6,7 @@ import android.content.res.TypedArray;
 import android.net.Uri;
 
 import com.eventdee.travyplan.R;
+import com.google.android.gms.location.places.Place;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -49,5 +50,38 @@ public class General {
             e.printStackTrace();
         }
         return imageUri;
+    }
+
+    public static String setAndroidType(int placeType) {
+
+        switch (placeType) {
+            case Place.TYPE_SCHOOL:
+                return "School";
+
+            case Place.TYPE_GYM:
+                return "Gym";
+
+            case Place.TYPE_RESTAURANT:
+                return "Eatery";
+
+            case Place.TYPE_LIBRARY:
+                return "Library";
+
+            case Place.TYPE_AIRPORT:
+                return "Airport";
+
+            case Place.TYPE_CAFE:
+                return "Cafe";
+
+            case Place.TYPE_POINT_OF_INTEREST:
+                return "Point of Interest";
+
+            case Place.TYPE_SUBWAY_STATION:
+                return "Subway Station";
+
+            case Place.TYPE_LODGING:
+                return "Accommodation";
+        }
+        return "unknown";
     }
 }
