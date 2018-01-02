@@ -106,7 +106,7 @@ public class AddTripActivity extends AppCompatActivity {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
                 if (i == EditorInfo.IME_ACTION_DONE) {
-                    addNewTrip();
+                    uploadFromUri(mPhotoUri);
                     return true;
                 }
                 return false;
@@ -231,15 +231,6 @@ public class AddTripActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             // Respond to the action bar's Up/Home button
             case R.id.action_update:
-                mTripName = etTripName.getText().toString().trim();
-                if (mTripName == null || mTripName.equalsIgnoreCase("")) {
-                    mTripName = "Trip #" + Constants.TRIP_NUMBER;
-                    Constants.TRIP_NUMBER += 1;
-                    editor.putInt("key_trip_number", Constants.TRIP_NUMBER);
-                    editor.commit();
-                } else {
-                    mTripName = etTripName.getText().toString().trim();
-                }
                 uploadFromUri(mPhotoUri);
                 return true;
             case R.id.action_photo:
@@ -255,6 +246,17 @@ public class AddTripActivity extends AppCompatActivity {
     }
 
     private void addNewTrip() {
+
+        mTripName = etTripName.getText().toString().trim();
+        if (mTripName == null || mTripName.equalsIgnoreCase("")) {
+            mTripName = "Trip #" + Constants.TRIP_NUMBER;
+            Constants.TRIP_NUMBER += 1;
+            editor.putInt("key_trip_number", Constants.TRIP_NUMBER);
+            editor.commit();
+        } else {
+            mTripName = etTripName.getText().toString().trim();
+        }
+
         mNewTrip = new Trip(mTripName, mStartDate.getTime(), mEndDate.getTime(), mPhotoUri.toString());
 
         if (mSource.equalsIgnoreCase("MainActivity")) {
@@ -306,7 +308,7 @@ public class AddTripActivity extends AppCompatActivity {
         Log.d(TAG, "uploadFromUri:src:" + fileUri.toString());
 
         // Save the File URI
-        mFileUri = fileUri;
+        mPhotoUri = fileUri;
 
         // Clear the last download, if any
         mDownloadUrl = null;
@@ -323,8 +325,8 @@ public class AddTripActivity extends AppCompatActivity {
 
     private void onUploadResultIntent(Intent intent) {
         // Got a new intent from MyUploadService with a success or failure
-        mPhotoUri = intent.getParcelableExtra(MyUploadService.EXTRA_DOWNLOAD_URL);
-        mFileUri = intent.getParcelableExtra(MyUploadService.EXTRA_FILE_URI);
+        mDownloadUrl = intent.getParcelableExtra(MyUploadService.EXTRA_DOWNLOAD_URL);
+        mPhotoUri = intent.getParcelableExtra(MyUploadService.EXTRA_FILE_URI);
 
         addNewTrip();
     }

@@ -60,9 +60,10 @@
 
                     <TextView
                         android:id="@+id/tv_place_date"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
+                        android:layout_weight="1"
                         android:fontFamily="sans-serif"
                         android:gravity="center"
                         android:padding="4dp"
@@ -71,9 +72,10 @@
 
                     <TextView
                         android:id="@+id/tv_place_time"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
+                        android:layout_weight="1"
                         android:fontFamily="sans-serif-light"
                         android:gravity="center"
                         android:text="--:--"
@@ -119,17 +121,18 @@
                     <ImageView
                         android:id="@+id/ivLocationImage"
                         android:layout_width="0dp"
-                        android:layout_weight="1"
                         android:layout_height="wrap_content"
                         android:layout_margin="16dp"
+                        android:layout_weight="1"
                         android:scaleType="fitCenter"
                         android:src="@drawable/bored_fox" />
+
                     <ImageView
                         android:id="@+id/iv_more"
                         android:layout_width="0dp"
-                        android:layout_weight="1"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
+                        android:layout_weight="1"
                         android:src="@drawable/ic_more_horiz_24dp" />
                 </LinearLayout>
 
@@ -139,8 +142,9 @@
                 android:id="@+id/banner_slider"
                 android:layout_width="match_parent"
                 android:layout_height="300dp"
-                app:defaultIndicators = "circle"
-                android:visibility="gone"/>
+                android:visibility="gone"
+                app:defaultBanner="1"
+                app:defaultIndicators="circle" />
 
         </LinearLayout>
 

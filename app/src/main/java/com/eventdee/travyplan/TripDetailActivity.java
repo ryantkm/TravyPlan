@@ -222,7 +222,6 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
         mEndDate = trip.getEndDate();
         tvTripDates.setText(String.format("%s to %s", General.dateFormat.format(mStartDate), General.dateFormat.format(mEndDate)));
         mCollapsingToolbar.setTitle(trip.getName());
-
     }
 
     @Override

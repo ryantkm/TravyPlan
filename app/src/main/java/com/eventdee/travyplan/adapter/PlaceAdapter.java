@@ -140,7 +140,7 @@ public class PlaceAdapter extends FirestoreAdapter<PlaceAdapter.ViewHolder> {
             if (getAdapterPosition() == 0) {
                 ivTransportIcon.setVisibility(View.GONE);
                 connectedLine.setVisibility(View.GONE);
-                setIsRecyclable(false);
+//                setIsRecyclable(false);
             }
 
             // Click listener
