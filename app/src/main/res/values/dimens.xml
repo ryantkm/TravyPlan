@@ -8,4 +8,6 @@
     <dimen name="trip_recycler_horizontal_spacing">8dp</dimen>
     <dimen name="trip_recycler_vertical_spacing">4dp</dimen>
     <dimen name="AppBarHeight">480dp</dimen>
+    <dimen name="app_bar_height">180dp</dimen>
+    <dimen name="text_margin">16dp</dimen>
 </resources>

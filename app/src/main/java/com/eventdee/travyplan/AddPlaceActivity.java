@@ -27,7 +27,6 @@ import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.GeoPoint;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -219,10 +218,19 @@ public class AddPlaceActivity extends AppCompatActivity implements View.OnClickL
                 newTravyPlace.setCountry((place.getLocale() != null) ? place.getLocale().getCountry():null);
                 newTravyPlace.setCountryCode((place.getLocale() != null) ? place.getLocale().getISO3Country():null);
                 newTravyPlace.setName((place.getName() != null) ? place.getName().toString():null);
-                newTravyPlace.setGeoPoint(new GeoPoint(place.getLatLng().latitude, place.getLatLng().longitude));
+                newTravyPlace.setLatitude(place.getLatLng().latitude);
+                newTravyPlace.setLongtitude(place.getLatLng().longitude);
+//                newTravyPlace.setGeoPoint(new GeoPoint(place.getLatLng().latitude, place.getLatLng().longitude));
                 if (place.getViewport() != null) {
-                    newTravyPlace.setNorthEastLatLngBounds(new GeoPoint(place.getViewport().northeast.latitude, place.getViewport().northeast.longitude));
-                    newTravyPlace.setSouthWestLatLngBounds(new GeoPoint(place.getViewport().southwest.latitude, place.getViewport().southwest.longitude));
+
+                    newTravyPlace.setNorthEastViewportLatitude(place.getViewport().northeast.latitude);
+                    newTravyPlace.setNorthEastViewportLongtitude(place.getViewport().northeast.longitude);
+
+                    newTravyPlace.setSouthWestViewportLatitude(place.getViewport().southwest.latitude);
+                    newTravyPlace.setSouthWestViewportLongtitude(place.getViewport().southwest.longitude);
+
+//                    newTravyPlace.setNorthEastLatLngBounds(new GeoPoint(place.getViewport().northeast.latitude, place.getViewport().northeast.longitude));
+//                    newTravyPlace.setSouthWestLatLngBounds(new GeoPoint(place.getViewport().southwest.latitude, place.getViewport().southwest.longitude));
                 }
                 newTravyPlace.setWebsiteUri((place.getWebsiteUri() != null) ? place.getWebsiteUri().toString():null);
                 newTravyPlace.setPhoneNumber((place.getPhoneNumber() != null) ? place.getPhoneNumber().toString():null);

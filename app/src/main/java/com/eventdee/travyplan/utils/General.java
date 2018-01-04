@@ -18,7 +18,7 @@ public class General {
     private static final int MAX_IMAGE_NUM = 22;
 
     public static SimpleDateFormat dateFormat  = new SimpleDateFormat("dd.MM.yyyy", Locale.US);
-    public static SimpleDateFormat dateFormatPlace  = new SimpleDateFormat("dd MMM", Locale.US);
+    public static SimpleDateFormat dateFormatPlace  = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
     public static SimpleDateFormat timeFormat  = new SimpleDateFormat("hh:mm", Locale.US);
 
     /**

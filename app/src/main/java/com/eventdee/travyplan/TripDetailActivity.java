@@ -46,6 +46,7 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
 
     public static final String TAG = TripDetailActivity.class.getSimpleName();
     public static final String KEY_TRIP_ID = "key_trip_id";
+    public static final String KEY_PLACE_ID = "key_place_id";
     private String mTripId;
     private String mPlaceId;
     private Trip mTrip;
@@ -55,7 +56,7 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
     @BindView(R.id.tv_trip_dates)
     TextView tvTripDates;
     @BindView(R.id.recycler_trip_items)
-    RecyclerView mPlacessRecycler;
+    RecyclerView mPlaceRecycler;
     @BindView(R.id.view_empty_trip_items)
     ViewGroup mEmptyView;
     @BindView(R.id.collapsing_toolbar)
@@ -116,16 +117,16 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
             @Override
             protected void onDataChanged() {
                 if (getItemCount() == 0) {
-                    mPlacessRecycler.setVisibility(View.GONE);
+                    mPlaceRecycler.setVisibility(View.GONE);
                     mEmptyView.setVisibility(View.VISIBLE);
                 } else {
-                    mPlacessRecycler.setVisibility(View.VISIBLE);
+                    mPlaceRecycler.setVisibility(View.VISIBLE);
                     mEmptyView.setVisibility(View.GONE);
                 }
             }
         };
-        mPlacessRecycler.setLayoutManager(new LinearLayoutManager(this));
-        mPlacessRecycler.setAdapter(mPlaceAdapter);
+        mPlaceRecycler.setLayoutManager(new LinearLayoutManager(this));
+        mPlaceRecycler.setAdapter(mPlaceAdapter);
 
         mTransportDialogFragment = new TransportDialogFragment();
     }
@@ -227,7 +228,13 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
 
     @Override
     public void onPlaceSelected(DocumentSnapshot place) {
-        Toast.makeText(this, "future action: display place details", Toast.LENGTH_SHORT).show();
+        mPlaceId = place.getId();
+        TravyPlace travyPlace = place.toObject(TravyPlace.class);
+        Intent placeIntent = new Intent(this, PlaceDetailActivity.class);
+        placeIntent.putExtra(KEY_TRIP_ID, mTripId);
+        placeIntent.putExtra(KEY_PLACE_ID, mPlaceId);
+        placeIntent.putExtra("place", travyPlace);
+        startActivity(placeIntent);
     }
 
     @Override
@@ -253,7 +260,7 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
                                 Log.d(TAG, "Trip successfully deleted!");
                                 Toast.makeText(TripDetailActivity.this, place.getString("name") + " deleted!", Toast.LENGTH_SHORT).show();
                                 if (position == 0) {
-                                    mPlacessRecycler.setAdapter(mPlaceAdapter);
+                                    mPlaceRecycler.setAdapter(mPlaceAdapter);
 //                                    mPlaceAdapter.notifyItemChanged(0);
                                     //TODO: need to refactor as removal animation is not smooth
                                 }
