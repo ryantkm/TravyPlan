@@ -12,11 +12,17 @@ import android.widget.TextView;
 
 import com.eventdee.travyplan.model.TravyPlace;
 import com.eventdee.travyplan.utils.General;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class PlaceDetailActivity extends AppCompatActivity {
+public class PlaceDetailActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     @BindView(R.id.toolbar_layout)
     CollapsingToolbarLayout mCollapsingToolbar;
@@ -48,5 +54,22 @@ public class PlaceDetailActivity extends AppCompatActivity {
 
         mCollapsingToolbar.setTitle(mPlace.getName());
         mTvPlaceType.setText(General.setAndroidType(mPlace.getPlaceTypes().get(0)));
+
+        // Get the SupportMapFragment and request notification
+        // when the map is ready to be used.
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+
+        mapFragment.getMapAsync(this);
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+
+        // Add a marker and move the map's camera to the location.
+        LatLng placeCoordinates = new LatLng(mPlace.getLatitude(), mPlace.getLongtitude());
+        googleMap.addMarker(new MarkerOptions().position(placeCoordinates)
+                .title(mPlace.getName()));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(placeCoordinates));
     }
 }
