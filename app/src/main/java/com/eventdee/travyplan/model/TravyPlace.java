@@ -10,7 +10,6 @@ import java.util.List;
 public class TravyPlace implements Parcelable {
 
     private Date date;
-    private String type;
     private String id;
     private List<Integer> placeTypes;
     private String address;
@@ -41,9 +40,8 @@ public class TravyPlace implements Parcelable {
     public TravyPlace() {
     }
 
-    public TravyPlace(Date date, String type) {
+    public TravyPlace(Date date) {
         this.date = date;
-        this.type = type;
     }
 
     public Date getDate() {
@@ -52,14 +50,6 @@ public class TravyPlace implements Parcelable {
 
     public void setDate(Date date) {
         this.date = date;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     public String getId() {
@@ -223,7 +213,6 @@ public class TravyPlace implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(this.date != null ? this.date.getTime() : -1);
-        dest.writeString(this.type);
         dest.writeString(this.id);
         dest.writeList(this.placeTypes);
         dest.writeString(this.address);
@@ -248,7 +237,6 @@ public class TravyPlace implements Parcelable {
     protected TravyPlace(Parcel in) {
         long tmpDate = in.readLong();
         this.date = tmpDate == -1 ? null : new Date(tmpDate);
-        this.type = in.readString();
         this.id = in.readString();
         this.placeTypes = new ArrayList<Integer>();
         in.readList(this.placeTypes, Integer.class.getClassLoader());

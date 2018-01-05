@@ -113,7 +113,7 @@ public class PlaceAdapter extends FirestoreAdapter<PlaceAdapter.ViewHolder> {
 //                    .into(ivPhoto);
 
             tvPlaceName.setText(travyPlace.getName());
-            tvPlaceType.setText(General.setAndroidType(travyPlace.getPlaceTypes().get(0)));
+            tvPlaceType.setText(General.setAndroidType(travyPlace.getPlaceTypes()));
             tvPlaceTime.setText(General.timeFormat.format(travyPlace.getDate()));
             tvPlaceDate.setText(General.dateFormatPlace.format(travyPlace.getDate()));
 

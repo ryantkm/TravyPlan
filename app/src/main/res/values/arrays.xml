@@ -49,22 +49,4 @@
         <item>none</item>
     </array>
 
-    <array name="place_type_icons_array">
-        <item>@drawable/ic_transport_walk</item>
-        <item>@drawable/ic_transport_hike</item>
-        <item>@drawable/ic_transport_bicycle</item>
-        <item>@drawable/ic_transport_motorcycle</item>
-        <item>@drawable/ic_transport_car</item>
-        <item>@drawable/ic_transport_taxi</item>
-    </array>
-
-    <array name="place_types_array">
-        <item>transportation</item>
-        <item>accomodation</item>
-        <item>eatery</item>
-        <item>unesco</item>
-        <item>place of interest</item>
-        <item>activity</item>
-    </array>
-
 </resources>

@@ -53,7 +53,7 @@ public class PlaceDetailActivity extends AppCompatActivity implements OnMapReady
         mPlace = intent.getParcelableExtra("place");
 
         mCollapsingToolbar.setTitle(mPlace.getName());
-        mTvPlaceType.setText(General.setAndroidType(mPlace.getPlaceTypes().get(0)));
+        mTvPlaceType.setText(General.setAndroidType(mPlace.getPlaceTypes()));
 
         // Get the SupportMapFragment and request notification
         // when the map is ready to be used.

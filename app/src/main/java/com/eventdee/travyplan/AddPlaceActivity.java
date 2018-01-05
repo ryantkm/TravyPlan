@@ -56,8 +56,6 @@ public class AddPlaceActivity extends AppCompatActivity implements View.OnClickL
 
     private com.google.android.gms.location.places.Place place;
     private TravyPlace newTravyPlace;
-    private PlaceTypeDialogFragment mPlaceTypeDialogFragment;
-    private String mPlaceTypeName;
 
     @BindView(R.id.date_picker)
     Button datePicker;
@@ -65,8 +63,6 @@ public class AddPlaceActivity extends AppCompatActivity implements View.OnClickL
     Button timePicker;
     @BindView(R.id.place_picker)
     Button placePicker;
-    @BindView(R.id.place_type_picker)
-    Button placeTypePicker;
     @BindView(R.id.add)
     Button btnAdd;
 
@@ -106,7 +102,6 @@ public class AddPlaceActivity extends AppCompatActivity implements View.OnClickL
         datePicker.setOnClickListener(this);
         timePicker.setOnClickListener(this);
         placePicker.setOnClickListener(this);
-        placeTypePicker.setOnClickListener(this);
         btnAdd.setOnClickListener(this);
 
         // Get Current Date & Time
@@ -116,7 +111,6 @@ public class AddPlaceActivity extends AppCompatActivity implements View.OnClickL
         mHour = calendar.get(Calendar.HOUR_OF_DAY);
         mMinute = calendar.get(Calendar.MINUTE);
 
-        mPlaceTypeDialogFragment = new PlaceTypeDialogFragment();
     }
 
     @Override
@@ -195,23 +189,18 @@ public class AddPlaceActivity extends AppCompatActivity implements View.OnClickL
                 e.printStackTrace();
             }
         }
-        if (view == placeTypePicker) {
-            mPlaceTypeDialogFragment.show(getSupportFragmentManager(), PlaceTypeDialogFragment.TAG);
-        }
 
         if (view == btnAdd) {
             if (datePicker.getText() == "") {
                 Toast.makeText(this, "Please select a date.", Toast.LENGTH_SHORT).show();
             } else if (place == null) {
                 Toast.makeText(this, "Please select a place.", Toast.LENGTH_SHORT).show();
-            } else if (placeTypePicker.getText() == "") {
-                Toast.makeText(this, "Please select a place type.", Toast.LENGTH_SHORT).show();
             } else {
                 if (timePicker.getText() == "") {
                     calendar.set(Calendar.HOUR_OF_DAY, 0);
                     calendar.set(Calendar.MINUTE, 0);
                 }
-                newTravyPlace = new TravyPlace(calendar.getTime(), mPlaceTypeName);
+                newTravyPlace = new TravyPlace(calendar.getTime());
                 newTravyPlace.setId(place.getId());
                 newTravyPlace.setPlaceTypes(place.getPlaceTypes());
                 newTravyPlace.setAddress((place.getAddress() != null) ? place.getAddress().toString():null);
@@ -255,19 +244,9 @@ public class AddPlaceActivity extends AppCompatActivity implements View.OnClickL
         if (requestCode == Constants.RC_PLACE_PICKER) {
             if (resultCode == RESULT_OK) {
                 place = PlacePicker.getPlace(this, data);
-//                String toastMsg = String.format("GooglePlace: %s", place.getName());
                 placePicker.setText(place.getName());
                 placePicker.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
             }
         }
-    }
-
-    public void update(View view) {
-        View childView = mPlaceTypeDialogFragment.mTransportIconsRecycler.findContainingItemView(view);
-        int imagePosition = mPlaceTypeDialogFragment.mTransportIconsRecycler.getChildAdapterPosition(childView);
-        mPlaceTypeName = getResources().obtainTypedArray(R.array.place_types_array).getString(imagePosition);
-        placeTypePicker.setText(mPlaceTypeName);
-        placeTypePicker.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
-        mPlaceTypeDialogFragment.dismiss();
     }
 }

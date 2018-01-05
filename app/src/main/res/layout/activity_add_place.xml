@@ -57,21 +57,6 @@
             android:gravity="center"
             android:hint="Select a place" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="50dp"
-            android:layout_gravity="center_horizontal"
-            android:gravity="center"
-            android:text="Place Type"
-            android:textSize="24sp" />
-
-        <Button
-            android:id="@+id/place_type_picker"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:gravity="center"
-            android:hint="Select a place type" />
-
     </LinearLayout>
 
     <Button
