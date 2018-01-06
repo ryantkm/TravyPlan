@@ -21,6 +21,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import me.zhanghai.android.materialratingbar.MaterialRatingBar;
 
 public class PlaceDetailActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -28,6 +29,8 @@ public class PlaceDetailActivity extends AppCompatActivity implements OnMapReady
     CollapsingToolbarLayout mCollapsingToolbar;
     @BindView(R.id.tv_place_type)
     TextView mTvPlaceType;
+    @BindView(R.id.place_rating)
+    MaterialRatingBar mRatingIndicator;
 
     private TravyPlace mPlace;
 
@@ -54,6 +57,7 @@ public class PlaceDetailActivity extends AppCompatActivity implements OnMapReady
 
         mCollapsingToolbar.setTitle(mPlace.getName());
         mTvPlaceType.setText(General.setAndroidType(mPlace.getPlaceTypes()));
+        mRatingIndicator.setRating(mPlace.getRating());
 
         // Get the SupportMapFragment and request notification
         // when the map is ready to be used.
