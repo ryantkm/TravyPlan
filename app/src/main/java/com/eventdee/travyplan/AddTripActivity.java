@@ -100,27 +100,13 @@ public class AddTripActivity extends AppCompatActivity {
         if (mSource.equalsIgnoreCase("TripDetailActivity")) {
             mEditTrip = intent.getParcelableExtra("trip");
             mEditTripId = intent.getStringExtra(TripDetailActivity.KEY_TRIP_ID);
-        }
-
-        etTripName.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                if (i == EditorInfo.IME_ACTION_DONE) {
-                    uploadFromUri(mPhotoUri);
-                    return true;
-                }
-                return false;
-            }
-        });
-
-        if (mSource.equalsIgnoreCase("MainActivity")) {
-            mPhotoUri = General.getRandomDrawableUrl(this);
-            tvStartDate.setText(General.dateFormat.format(mCurrentDate.getTimeInMillis()));
-        } else if (mSource.equalsIgnoreCase("TripDetailActivity")){
             mPhotoUri = Uri.parse(mEditTrip.getCoverPhoto());
             etTripName.setText(mEditTrip.getName());
             tvStartDate.setText(General.dateFormat.format(mEditTrip.getStartDate().getTime()));
             tvEndDate.setText(General.dateFormat.format(mEditTrip.getEndDate().getTime()));
+        } else if (mSource.equalsIgnoreCase("MainActivity")) {
+            mPhotoUri = General.getRandomDrawableUrl(this);
+            tvStartDate.setText(General.dateFormat.format(mCurrentDate.getTimeInMillis()));
         }
         Glide.with(ivTripPhoto.getContext())
                 .load(mPhotoUri)
@@ -159,6 +145,17 @@ public class AddTripActivity extends AppCompatActivity {
                 }
             }
         };
+
+        etTripName.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                if (i == EditorInfo.IME_ACTION_DONE) {
+                    uploadFromUri(mPhotoUri);
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
     @Override
@@ -245,8 +242,7 @@ public class AddTripActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void addNewTrip() {
-
+    private void addNewTrip(Uri downloadUri) {
         mTripName = etTripName.getText().toString().trim();
         if (mTripName == null || mTripName.equalsIgnoreCase("")) {
             mTripName = "Trip #" + Constants.TRIP_NUMBER;
@@ -257,7 +253,7 @@ public class AddTripActivity extends AppCompatActivity {
             mTripName = etTripName.getText().toString().trim();
         }
 
-        mNewTrip = new Trip(mTripName, mStartDate.getTime(), mEndDate.getTime(), mPhotoUri.toString());
+        mNewTrip = new Trip(mTripName, mStartDate.getTime(), mEndDate.getTime(), downloadUri.toString());
 
         if (mSource.equalsIgnoreCase("MainActivity")) {
             try {
@@ -307,9 +303,6 @@ public class AddTripActivity extends AppCompatActivity {
     private void uploadFromUri(Uri fileUri) {
         Log.d(TAG, "uploadFromUri:src:" + fileUri.toString());
 
-        // Save the File URI
-        mPhotoUri = fileUri;
-
         // Clear the last download, if any
         mDownloadUrl = null;
 
@@ -328,7 +321,11 @@ public class AddTripActivity extends AppCompatActivity {
         mDownloadUrl = intent.getParcelableExtra(MyUploadService.EXTRA_DOWNLOAD_URL);
         mPhotoUri = intent.getParcelableExtra(MyUploadService.EXTRA_FILE_URI);
 
-        addNewTrip();
+        // download uri will be null if trip is updated with the same cover photo
+        if (mDownloadUrl == null) {
+            mDownloadUrl =mPhotoUri;
+        }
+        addNewTrip(mDownloadUrl);
     }
 
     @Override

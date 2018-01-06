@@ -9,7 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import com.eventdee.travyplan.MainActivity;
+import com.eventdee.travyplan.AddTripActivity;
 import com.eventdee.travyplan.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -146,7 +146,7 @@ public class MyUploadService extends MyBaseTaskService {
         dismissProgressNotification();
 
         // Make Intent to MainActivity
-        Intent intent = new Intent(this, MainActivity.class)
+        Intent intent = new Intent(this, AddTripActivity.class)
                 .putExtra(EXTRA_DOWNLOAD_URL, downloadUrl)
                 .putExtra(EXTRA_FILE_URI, fileUri)
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
