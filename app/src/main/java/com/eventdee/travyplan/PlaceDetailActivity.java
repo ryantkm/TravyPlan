@@ -80,8 +80,6 @@ public class PlaceDetailActivity extends AppCompatActivity implements OnMapReady
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-//        mNotesDialog = new NotesDialogFragment();
-
         Intent intent = getIntent();
         mPlace = intent.getParcelableExtra("place");
         mTripId = intent.getStringExtra(KEY_TRIP_ID);

@@ -25,7 +25,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="200dp"
         app:counterEnabled="true"
-        app:counterMaxLength="@dimen/trip_name_max"
+        app:counterMaxLength="@integer/trip_name_max"
         app:counterTextAppearance="@style/AppTheme.TextAppearance.Counter"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
