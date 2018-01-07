@@ -1,6 +1,7 @@
 package com.eventdee.travyplan;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -29,8 +30,18 @@ public class PlaceDetailActivity extends AppCompatActivity implements OnMapReady
     CollapsingToolbarLayout mCollapsingToolbar;
     @BindView(R.id.tv_place_type)
     TextView mTvPlaceType;
-    @BindView(R.id.place_rating)
+    @BindView(R.id.tv_place_rating)
+    TextView mTvPlaceRating;
+    @BindView(R.id.place_rating_bar)
     MaterialRatingBar mRatingIndicator;
+    @BindView(R.id.tv_place_address)
+    TextView mTvPlaceAddress;
+    @BindView(R.id.tv_place_website)
+    TextView mTvPlaceWebsite;
+    @BindView(R.id.tv_place_phone)
+    TextView mTvPlacePhone;
+    @BindView(R.id.tv_notes)
+    TextView mTvNotes;
 
     private TravyPlace mPlace;
 
@@ -58,6 +69,11 @@ public class PlaceDetailActivity extends AppCompatActivity implements OnMapReady
         mCollapsingToolbar.setTitle(mPlace.getName());
         mTvPlaceType.setText(General.setAndroidType(mPlace.getPlaceTypes()));
         mRatingIndicator.setRating(mPlace.getRating());
+        mTvPlaceRating.setText(String.valueOf(mPlace.getRating()));
+        mTvPlaceAddress.setText(mPlace.getAddress());
+        mTvPlaceWebsite.setText(mPlace.getWebsiteUri());
+        mTvPlacePhone.setText(mPlace.getPhoneNumber());
+        mTvNotes.setText(mPlace.getNotes());
 
         // Get the SupportMapFragment and request notification
         // when the map is ready to be used.
@@ -75,5 +91,39 @@ public class PlaceDetailActivity extends AppCompatActivity implements OnMapReady
         googleMap.addMarker(new MarkerOptions().position(placeCoordinates)
                 .title(mPlace.getName()));
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(placeCoordinates));
+    }
+
+    public void callPlace(View view) {
+        String phoneNumber = mPlace.getPhoneNumber();
+        Intent intent = new Intent(Intent.ACTION_DIAL);
+        intent.setData(Uri.parse("tel:" + phoneNumber));
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        }
+    }
+
+    public void goToWebsite(View view) {
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_VIEW);
+        intent.addCategory(Intent.CATEGORY_BROWSABLE);
+        intent.setData(Uri.parse(mPlace.getWebsiteUri()));
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        }
+    }
+
+    public void goToMap(View view) {
+        String mapUri = "https://www.google.com/maps/search/?api=1&query="
+                + mPlace.getLatitude()
+                + ","
+                + mPlace.getLongtitude()
+                +"&query_place_id="
+                + mPlace.getId();
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(mapUri));
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        }
     }
 }

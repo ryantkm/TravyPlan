@@ -36,6 +36,7 @@ public class TravyPlace implements Parcelable {
     private String attributions;
     private String transportMode;
     private ArrayList<String> photos;
+    private String notes;
 
     public TravyPlace() {
     }
@@ -204,6 +205,14 @@ public class TravyPlace implements Parcelable {
         this.photos = photos;
     }
 
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
 
     @Override
     public int describeContents() {
@@ -232,6 +241,7 @@ public class TravyPlace implements Parcelable {
         dest.writeString(this.attributions);
         dest.writeString(this.transportMode);
         dest.writeStringList(this.photos);
+        dest.writeString(this.notes);
     }
 
     protected TravyPlace(Parcel in) {
@@ -257,6 +267,7 @@ public class TravyPlace implements Parcelable {
         this.attributions = in.readString();
         this.transportMode = in.readString();
         this.photos = in.createStringArrayList();
+        this.notes = in.readString();
     }
 
     public static final Creator<TravyPlace> CREATOR = new Creator<TravyPlace>() {

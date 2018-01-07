@@ -10,4 +10,6 @@
     <dimen name="AppBarHeight">480dp</dimen>
     <dimen name="app_bar_height">180dp</dimen>
     <dimen name="text_margin">16dp</dimen>
+
+    <dimen name="trip_name_max">35</dimen>
 </resources>

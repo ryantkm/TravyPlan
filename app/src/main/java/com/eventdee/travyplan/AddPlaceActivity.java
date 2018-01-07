@@ -225,7 +225,6 @@ public class AddPlaceActivity extends AppCompatActivity implements View.OnClickL
                 newTravyPlace.setPhoneNumber((place.getPhoneNumber() != null) ? place.getPhoneNumber().toString():null);
                 newTravyPlace.setRating(place.getRating());
                 newTravyPlace.setPriceLevel(place.getPriceLevel());
-                newTravyPlace.setPriceLevel(place.getPriceLevel());
                 newTravyPlace.setAttributions((place.getAttributions() != null) ? place.getAttributions().toString():null);
 
                 mTripRef.collection("places").add(newTravyPlace);

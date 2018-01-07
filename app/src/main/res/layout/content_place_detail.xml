@@ -19,25 +19,97 @@
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
             android:layout_height="250dp"
-            app:liteMode="true"
             app:cameraZoom="14"
+            app:liteMode="true"
             tools:context="com.eventdee.travyplan.PlaceDetailActivity" />
 
-        <me.zhanghai.android.materialratingbar.MaterialRatingBar
-            android:id="@+id/place_rating"
-            android:layout_gravity="end"
-            android:layout_marginEnd="@dimen/fab_margin"
-            style="@style/Widget.MaterialRatingBar.RatingBar.Indicator.Small"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_width="wrap_content" />
+            android:layout_margin="@dimen/fab_margin"
+            android:onClick="goToMap"
+            android:orientation="horizontal">
 
-        <TextView
-            android:layout_width="wrap_content"
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/fab_margin"
+                app:srcCompat="@drawable/ic_address_24dp" />
+
+            <TextView
+                android:id="@+id/tv_place_address"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="@dimen/fab_margin" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/text_margin"
-            android:text="@string/large_text" />
+            android:layout_margin="@dimen/fab_margin"
+            android:onClick="goToWebsite"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/fab_margin"
+                app:srcCompat="@drawable/ic_website_24dp" />
+
+            <TextView
+                android:id="@+id/tv_place_website"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="@dimen/fab_margin" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/fab_margin"
+            android:onClick="callPlace"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/fab_margin"
+                app:srcCompat="@drawable/ic_phone_24dp" />
+
+            <TextView
+                android:id="@+id/tv_place_phone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="@dimen/fab_margin" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/fab_margin"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/fab_margin"
+                app:srcCompat="@drawable/ic_notes_24dp" />
+
+            <TextView
+                android:id="@+id/tv_notes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="@dimen/fab_margin" />
+
+        </LinearLayout>
 
     </LinearLayout>
-
 
 </android.support.v4.widget.NestedScrollView>

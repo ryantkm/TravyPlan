@@ -91,6 +91,8 @@ public class General {
                     return "Bakery";
                 case Place.TYPE_RESTAURANT:
                     return "Restaurant";
+                case Place.TYPE_FOOD:
+                    return "Eatery";
 
                 case Place.TYPE_MUSEUM:
                     return "Museum";
@@ -119,9 +121,6 @@ public class General {
                     return "Church";
                 case Place.TYPE_HINDU_TEMPLE:
                     return "Hindu Temple";
-
-                case Place.TYPE_POINT_OF_INTEREST:
-                    return "Point of Interest";
 
                 case Place.TYPE_HOSPITAL:
                     return "Hospital";
@@ -171,9 +170,24 @@ public class General {
                     return "Pet Store";
                 case Place.TYPE_STORE:
                     return "Store";
+
+                case Place.TYPE_POINT_OF_INTEREST:
+                    return "Point of Interest";
             }
         }
         return "General";
+    }
+
+    public static String getPriceString(int priceInt) {
+        switch (priceInt) {
+            case 1:
+                return "$";
+            case 2:
+                return "$$";
+            case 3:
+            default:
+                return "$$$";
+        }
     }
 }
 
