@@ -1,12 +1,12 @@
 package com.eventdee.travyplan;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.eventdee.travyplan.model.TravyPlace;
+import com.eventdee.travyplan.utils.Constants;
 import com.eventdee.travyplan.utils.General;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -26,6 +27,8 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -57,6 +60,7 @@ public class PlaceDetailActivity extends AppCompatActivity implements OnMapReady
 
     private TravyPlace mPlace;
     private String mTripId, mPlaceId;
+    private Date mStartDate, mEndDate;
     private NotesDialogFragment mNotesDialog;
 
     private FirebaseFirestore mFirestore;
@@ -74,8 +78,18 @@ public class PlaceDetailActivity extends AppCompatActivity implements OnMapReady
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Future Action: Display Edit Activity", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+
+                Intent editPlace = new Intent(getApplicationContext(), AddPlaceActivity.class);
+                editPlace.putExtra("tag", TAG);
+                editPlace.putExtra("place", mPlace);
+                editPlace.putExtra(KEY_PLACE_ID, mPlaceId);
+                editPlace.putExtra(KEY_TRIP_ID, mTripId);
+                editPlace.putExtra("startDate", mStartDate.getTime());
+                editPlace.putExtra("endDate", mEndDate.getTime());
+                startActivityForResult(editPlace, Constants.RC_UPDATE_PLACE);
+
+//                Snackbar.make(view, "Future Action: Display Edit Activity", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -84,6 +98,8 @@ public class PlaceDetailActivity extends AppCompatActivity implements OnMapReady
         mPlace = intent.getParcelableExtra("place");
         mTripId = intent.getStringExtra(KEY_TRIP_ID);
         mPlaceId = intent.getStringExtra(KEY_PLACE_ID);
+        mStartDate = new Date(intent.getLongExtra("startDate",0));
+        mEndDate = new Date(intent.getLongExtra("endDate",0));
 
         // Initialize Firestore
         mFirestore = FirebaseFirestore.getInstance();
@@ -91,6 +107,17 @@ public class PlaceDetailActivity extends AppCompatActivity implements OnMapReady
         // Get reference to the place
         mPlaceRef = mFirestore.collection("trips").document(mTripId).collection("places").document(mPlaceId);
 
+        updateUI();
+
+        // Get the SupportMapFragment and request notification
+        // when the map is ready to be used.
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+
+        mapFragment.getMapAsync(this);
+    }
+
+    private void updateUI() {
         mCollapsingToolbar.setTitle(mPlace.getName());
         mTvPlaceType.setText(General.setAndroidType(mPlace.getPlaceTypes()));
         mRatingIndicator.setRating(mPlace.getRating());
@@ -99,13 +126,6 @@ public class PlaceDetailActivity extends AppCompatActivity implements OnMapReady
         mTvPlaceWebsite.setText(mPlace.getWebsiteUri());
         mTvPlacePhone.setText(mPlace.getPhoneNumber());
         mTvNotes.setText(mPlace.getNotes());
-
-        // Get the SupportMapFragment and request notification
-        // when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-
-        mapFragment.getMapAsync(this);
     }
 
     @Override
@@ -178,5 +198,20 @@ public class PlaceDetailActivity extends AppCompatActivity implements OnMapReady
                         Log.w(TAG, "Error updating document", e);
                     }
                 });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (requestCode == Constants.RC_UPDATE_PLACE) {
+
+            if (resultCode == Activity.RESULT_OK) {
+                mPlace = data.getParcelableExtra("place");
+                updateUI();
+
+            } else if (resultCode == Activity.RESULT_CANCELED) {
+                // some stuff that will happen if there's no result
+            }
+        }
     }
 }

@@ -12,6 +12,7 @@ public final class Constants {
     public static final int RC_GET_IMAGE = 4;
     public static final int RC_SIGN_IN = 5;
     public static final int RC_PLACE_PICKER = 6;
+    public static final int RC_UPDATE_PLACE = 7;
 
     public static int TRIP_NUMBER = 1;
 

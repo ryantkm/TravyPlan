@@ -1,5 +1,6 @@
 package com.eventdee.travyplan;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
@@ -10,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -21,6 +23,7 @@ import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.places.GeoDataClient;
+import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceDetectionClient;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlacePicker;
@@ -33,13 +36,13 @@ import java.util.Date;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.eventdee.travyplan.TripDetailActivity.KEY_PLACE_ID;
 import static com.eventdee.travyplan.TripDetailActivity.KEY_TRIP_ID;
 
 public class AddPlaceActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener{
 
     private Date mStartDate, mEndDate;
-    private boolean mIsEmpty;
-    private String mTripId;
+    private String mTripId, mPlaceId;
     private int mYear, mMonth, mDay, mHour, mMinute;
     private Calendar calendar = Calendar.getInstance();
     private String timeSelectedString;
@@ -53,8 +56,9 @@ public class AddPlaceActivity extends AppCompatActivity implements View.OnClickL
     private FirebaseFirestore mFirestore;
     private DocumentReference mTripRef;
 
-    private com.google.android.gms.location.places.Place place;
     private TravyPlace newTravyPlace;
+
+    private String mSource;
 
     @BindView(R.id.date_picker)
     Button datePicker;
@@ -64,6 +68,9 @@ public class AddPlaceActivity extends AppCompatActivity implements View.OnClickL
     Button placePicker;
     @BindView(R.id.add)
     Button btnAdd;
+    @BindView(R.id.et_add_notes)
+    EditText editTextNotes;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,10 +79,37 @@ public class AddPlaceActivity extends AppCompatActivity implements View.OnClickL
         ButterKnife.bind(this);
 
         Intent intent = getIntent();
+        mSource = intent.getStringExtra("tag");
+        mTripId = intent.getStringExtra(KEY_TRIP_ID);
         mStartDate = new Date(intent.getLongExtra("startDate",0));
         mEndDate = new Date(intent.getLongExtra("endDate",0));
-        mIsEmpty = intent.getBooleanExtra("isEmpty", true);
-        mTripId = intent.getStringExtra(KEY_TRIP_ID);
+
+        if (mSource.equalsIgnoreCase("PlaceDetailActivity")) {
+
+            btnAdd.setText("Update");
+
+            mTripId = intent.getStringExtra(KEY_TRIP_ID);
+            mPlaceId = intent.getStringExtra(KEY_PLACE_ID);
+
+            newTravyPlace = intent.getParcelableExtra("place");
+
+            calendar.setTime(newTravyPlace.getDate());
+
+            datePicker.setText(General.dateFormat.format(newTravyPlace.getDate()));
+            datePicker.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+
+            timePicker.setText(General.timeFormat.format(newTravyPlace.getDate()));
+            timePicker.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+
+            placePicker.setText(newTravyPlace.getName());
+            placePicker.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+
+            editTextNotes.setText(newTravyPlace.getNotes());
+            editTextNotes.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+        } else {
+            btnAdd.setText("Add");
+        }
+
         if (mTripId == null) {
             throw new IllegalArgumentException("Must pass extra " + KEY_TRIP_ID);
         }
@@ -181,47 +215,66 @@ public class AddPlaceActivity extends AppCompatActivity implements View.OnClickL
         }
 
         if (view == btnAdd) {
-            if (datePicker.getText() == "") {
-                Toast.makeText(this, "Please select a date.", Toast.LENGTH_SHORT).show();
-            } else if (place == null) {
-                Toast.makeText(this, "Please select a place.", Toast.LENGTH_SHORT).show();
-            } else {
-                if (timePicker.getText() == "") {
-                    calendar.set(Calendar.HOUR_OF_DAY, 0);
-                    calendar.set(Calendar.MINUTE, 0);
+            if (mSource.equalsIgnoreCase("TripDetailActivity")) {
+                if (datePicker.getText() == "") {
+                    Toast.makeText(this, "Please select a date.", Toast.LENGTH_SHORT).show();
+                } else if (newTravyPlace == null) {
+                    Toast.makeText(this, "Please select a place.", Toast.LENGTH_SHORT).show();
+                } else {
+                    if (timePicker.getText() == "") {
+                        calendar.set(Calendar.HOUR_OF_DAY, 0);
+                        calendar.set(Calendar.MINUTE, 0);
+                    }
+                    newTravyPlace = new TravyPlace(calendar.getTime());
+
+                    newTravyPlace.setNotes(editTextNotes.getText().toString().trim());
+
+                    mTripRef.collection("places").add(newTravyPlace);
+                    Toast.makeText(this, "location added: " + newTravyPlace.getName(), Toast.LENGTH_SHORT).show();
+                    finish();
                 }
-                newTravyPlace = new TravyPlace(calendar.getTime());
-                newTravyPlace.setId(place.getId());
-                newTravyPlace.setPlaceTypes(place.getPlaceTypes());
-                newTravyPlace.setAddress((place.getAddress() != null) ? place.getAddress().toString():null);
-                newTravyPlace.setCountry((place.getLocale() != null) ? place.getLocale().getCountry():null);
-                newTravyPlace.setCountryCode((place.getLocale() != null) ? place.getLocale().getISO3Country():null);
-                newTravyPlace.setName((place.getName() != null) ? place.getName().toString():null);
-                newTravyPlace.setLatitude(place.getLatLng().latitude);
-                newTravyPlace.setLongtitude(place.getLatLng().longitude);
-//                newTravyPlace.setGeoPoint(new GeoPoint(place.getLatLng().latitude, place.getLatLng().longitude));
-                if (place.getViewport() != null) {
+            }else if (mSource.equalsIgnoreCase("PlaceDetailActivity")) {
+                newTravyPlace.setDate(calendar.getTime());
+                newTravyPlace.setNotes(editTextNotes.getText().toString().trim());
 
-                    newTravyPlace.setNorthEastViewportLatitude(place.getViewport().northeast.latitude);
-                    newTravyPlace.setNorthEastViewportLongtitude(place.getViewport().northeast.longitude);
+                mTripRef.collection("places").document(mPlaceId).set(newTravyPlace);
+                Toast.makeText(this, "location updated: " + newTravyPlace.getName(), Toast.LENGTH_SHORT).show();
 
-                    newTravyPlace.setSouthWestViewportLatitude(place.getViewport().southwest.latitude);
-                    newTravyPlace.setSouthWestViewportLongtitude(place.getViewport().southwest.longitude);
+                Intent intent = new Intent();
+                intent.putExtra("place", newTravyPlace);
+                setResult(Activity.RESULT_OK, intent);
 
-//                    newTravyPlace.setNorthEastLatLngBounds(new GeoPoint(place.getViewport().northeast.latitude, place.getViewport().northeast.longitude));
-//                    newTravyPlace.setSouthWestLatLngBounds(new GeoPoint(place.getViewport().southwest.latitude, place.getViewport().southwest.longitude));
-                }
-                newTravyPlace.setWebsiteUri((place.getWebsiteUri() != null) ? place.getWebsiteUri().toString():null);
-                newTravyPlace.setPhoneNumber((place.getPhoneNumber() != null) ? place.getPhoneNumber().toString():null);
-                newTravyPlace.setRating(place.getRating());
-                newTravyPlace.setPriceLevel(place.getPriceLevel());
-                newTravyPlace.setAttributions((place.getAttributions() != null) ? place.getAttributions().toString():null);
-
-                mTripRef.collection("places").add(newTravyPlace);
-                Toast.makeText(this, "location added: " + newTravyPlace.getName(), Toast.LENGTH_SHORT).show();
                 finish();
             }
         }
+    }
+
+    private void updatePlace(Place place) {
+        newTravyPlace.setId(place.getId());
+        newTravyPlace.setPlaceTypes(place.getPlaceTypes());
+        newTravyPlace.setAddress((place.getAddress() != null) ? place.getAddress().toString():null);
+        newTravyPlace.setCountry((place.getLocale() != null) ? place.getLocale().getCountry():null);
+        newTravyPlace.setCountryCode((place.getLocale() != null) ? place.getLocale().getISO3Country():null);
+        newTravyPlace.setName((place.getName() != null) ? place.getName().toString():null);
+        newTravyPlace.setLatitude(place.getLatLng().latitude);
+        newTravyPlace.setLongtitude(place.getLatLng().longitude);
+//                newTravyPlace.setGeoPoint(new GeoPoint(place.getLatLng().latitude, place.getLatLng().longitude));
+        if (place.getViewport() != null) {
+
+            newTravyPlace.setNorthEastViewportLatitude(place.getViewport().northeast.latitude);
+            newTravyPlace.setNorthEastViewportLongtitude(place.getViewport().northeast.longitude);
+
+            newTravyPlace.setSouthWestViewportLatitude(place.getViewport().southwest.latitude);
+            newTravyPlace.setSouthWestViewportLongtitude(place.getViewport().southwest.longitude);
+
+//                    newTravyPlace.setNorthEastLatLngBounds(new GeoPoint(place.getViewport().northeast.latitude, place.getViewport().northeast.longitude));
+//                    newTravyPlace.setSouthWestLatLngBounds(new GeoPoint(place.getViewport().southwest.latitude, place.getViewport().southwest.longitude));
+        }
+        newTravyPlace.setWebsiteUri((place.getWebsiteUri() != null) ? place.getWebsiteUri().toString():null);
+        newTravyPlace.setPhoneNumber((place.getPhoneNumber() != null) ? place.getPhoneNumber().toString():null);
+        newTravyPlace.setRating(place.getRating());
+        newTravyPlace.setPriceLevel(place.getPriceLevel());
+        newTravyPlace.setAttributions((place.getAttributions() != null) ? place.getAttributions().toString():null);
     }
 
     @Override
@@ -232,9 +285,10 @@ public class AddPlaceActivity extends AppCompatActivity implements View.OnClickL
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == Constants.RC_PLACE_PICKER) {
             if (resultCode == RESULT_OK) {
-                place = PlacePicker.getPlace(this, data);
+                Place place = PlacePicker.getPlace(this, data);
                 placePicker.setText(place.getName());
                 placePicker.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                updatePlace(place);
             }
         }
     }

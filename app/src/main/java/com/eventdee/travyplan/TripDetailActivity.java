@@ -91,6 +91,7 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
                 addPlace.putExtra("startDate", mStartDate.getTime());
                 addPlace.putExtra("endDate", mEndDate.getTime());
                 addPlace.putExtra(KEY_TRIP_ID, mTripId);
+                addPlace.putExtra("tag", TAG);
                 startActivityForResult(addPlace, Constants.RC_ADD_TRIP_ITEM);
             }
         });
@@ -234,6 +235,8 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
         placeIntent.putExtra(KEY_TRIP_ID, mTripId);
         placeIntent.putExtra(KEY_PLACE_ID, mPlaceId);
         placeIntent.putExtra("place", travyPlace);
+        placeIntent.putExtra("startDate", mStartDate.getTime());
+        placeIntent.putExtra("endDate", mEndDate.getTime());
         startActivity(placeIntent);
     }
 

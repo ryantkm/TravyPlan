@@ -8,9 +8,15 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
         android:orientation="vertical"
-        android:padding="16dp">
+        app:layout_constraintBottom_toTopOf="@id/add"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:layout_width="wrap_content"
@@ -24,6 +30,7 @@
             android:id="@+id/date_picker"
             android:layout_width="match_parent"
             android:layout_height="60dp"
+            android:background="@color/greyDisabled"
             android:gravity="center"
             android:hint="Select a date" />
 
@@ -39,6 +46,7 @@
             android:id="@+id/time_picker"
             android:layout_width="match_parent"
             android:layout_height="60dp"
+            android:background="@color/greyDisabled"
             android:gravity="center"
             android:hint="Select a time" />
 
@@ -54,8 +62,27 @@
             android:id="@+id/place_picker"
             android:layout_width="match_parent"
             android:layout_height="60dp"
+            android:background="@color/greyDisabled"
             android:gravity="center"
             android:hint="Select a place" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center"
+            android:text="Notes"
+            android:textSize="24sp" />
+
+        <EditText
+            android:id="@+id/et_add_notes"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="@dimen/fab_margin"
+            android:background="@color/greyDisabled"
+            android:gravity="top"
+            android:inputType="textMultiLine"
+            android:padding="@dimen/fab_margin" />
 
     </LinearLayout>
 
