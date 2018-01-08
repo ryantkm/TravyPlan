@@ -27,7 +27,7 @@
         <item>@drawable/ic_transport_ferry</item>
         <item>@drawable/ic_transport_plane</item>
         <item>@drawable/speedboat</item>
-        <item>@drawable/ic_crop_free_46dp</item>
+        <item>@drawable/ic_crop_free_36dp</item>
     </array>
 
     <array name="transport_modes_array">

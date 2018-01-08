@@ -6,31 +6,42 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <FrameLayout
+    <!--<FrameLayout-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_gravity="left"-->
+        <!--android:layout_marginLeft="@dimen/fab_margin"-->
+        <!--android:gravity="center"-->
+        <!--android:orientation="horizontal">-->
+
+        <!--<View-->
+            <!--android:id="@+id/connected_line"-->
+            <!--android:layout_width="2dp"-->
+            <!--android:layout_height="50dp"-->
+            <!--android:layout_gravity="center"-->
+            <!--android:background="@color/colorPrimary" />-->
+
+        <!--<ImageView-->
+            <!--android:id="@+id/iv_transport_icon"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_gravity="center"-->
+            <!--android:background="@android:color/white"-->
+            <!--android:padding="2dp"-->
+            <!--app:srcCompat="@drawable/ic_crop_free_46dp" />-->
+
+    <!--</FrameLayout>-->
+
+    <ImageView
+        android:id="@+id/iv_transport_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="left"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
         android:layout_marginLeft="@dimen/fab_margin"
-        android:gravity="center"
-        android:orientation="horizontal">
-
-        <View
-            android:id="@+id/connected_line"
-            android:layout_width="2dp"
-            android:layout_height="50dp"
-            android:layout_gravity="center"
-            android:background="@color/colorPrimary" />
-
-        <ImageView
-            android:id="@+id/iv_transport_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:background="@android:color/white"
-            android:padding="2dp"
-            app:srcCompat="@drawable/ic_crop_free_46dp" />
-
-    </FrameLayout>
+        android:background="@android:color/white"
+        app:srcCompat="@drawable/ic_crop_free_36dp" />
 
     <android.support.v7.widget.CardView
         android:layout_width="match_parent"

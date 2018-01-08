@@ -82,8 +82,8 @@ public class PlaceAdapter extends FirestoreAdapter<PlaceAdapter.ViewHolder> {
         @BindView(R.id.iv_more)
         ImageView ivMoreOptions;
 
-        @BindView(R.id.connected_line)
-        View connectedLine;
+//        @BindView(R.id.connected_line)
+//        View connectedLine;
         @BindView(R.id.iv_transport_icon)
         ImageView ivTransportIcon;
 
@@ -129,17 +129,17 @@ public class PlaceAdapter extends FirestoreAdapter<PlaceAdapter.ViewHolder> {
             }
 
             if (transportMode == null) {
-                ivTransportIcon.setImageResource(R.drawable.ic_crop_free_46dp);
-                connectedLine.setVisibility(View.GONE);
+                ivTransportIcon.setImageResource(R.drawable.ic_crop_free_36dp);
+//                connectedLine.setVisibility(View.GONE);
             } else {
                 ivTransportIcon.setVisibility(View.VISIBLE);
-                connectedLine.setVisibility(View.VISIBLE);
+//                connectedLine.setVisibility(View.VISIBLE);
                 Drawable selectedTransportDrawable = transportIconArray.getDrawable(indexPosition);
                 ivTransportIcon.setImageDrawable(selectedTransportDrawable);
             }
             if (getAdapterPosition() == 0) {
                 ivTransportIcon.setVisibility(View.GONE);
-                connectedLine.setVisibility(View.GONE);
+//                connectedLine.setVisibility(View.GONE);
 //                setIsRecyclable(false);
             }
 
