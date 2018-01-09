@@ -26,7 +26,8 @@
             app:expandedTitleMarginStart="48dp"
             android:fontFamily="sans-serif-light"
             app:expandedTitleTextAppearance="@android:color/white"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed">
+            app:layout_scrollFlags="enterAlways|enterAlwaysCollapsed"
+            android:minHeight="?attr/actionBarSize">
 
             <ImageView
                 android:id="@+id/iv_trip_photo"

@@ -225,8 +225,8 @@ public class AddPlaceActivity extends AppCompatActivity implements View.OnClickL
                         calendar.set(Calendar.HOUR_OF_DAY, 0);
                         calendar.set(Calendar.MINUTE, 0);
                     }
-                    newTravyPlace = new TravyPlace(calendar.getTime());
 
+                    newTravyPlace.setDate(calendar.getTime());
                     newTravyPlace.setNotes(editTextNotes.getText().toString().trim());
 
                     mTripRef.collection("places").add(newTravyPlace);
@@ -250,6 +250,7 @@ public class AddPlaceActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private void updatePlace(Place place) {
+        newTravyPlace = new TravyPlace();
         newTravyPlace.setId(place.getId());
         newTravyPlace.setPlaceTypes(place.getPlaceTypes());
         newTravyPlace.setAddress((place.getAddress() != null) ? place.getAddress().toString():null);

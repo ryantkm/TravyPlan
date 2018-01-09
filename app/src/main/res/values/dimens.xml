@@ -7,8 +7,9 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="trip_recycler_horizontal_spacing">8dp</dimen>
     <dimen name="trip_recycler_vertical_spacing">4dp</dimen>
-    <dimen name="AppBarHeight">400dp</dimen>
+    <dimen name="AppBarHeight">200dp</dimen>
     <dimen name="app_bar_height">180dp</dimen>
+    <dimen name="standard_app_bar_height">56dp</dimen>
     <dimen name="text_margin">16dp</dimen>
 
     <integer name="trip_name_max">35</integer>
