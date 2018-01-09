@@ -38,7 +38,7 @@ public class PlaceAdapter extends FirestoreAdapter<PlaceAdapter.ViewHolder> {
 
     public interface OnPlaceSelectedListener {
 
-        void onPlaceSelected(DocumentSnapshot place);
+        void onPlaceSelected(DocumentSnapshot place, int position);
 
         void onTransportSelected(DocumentSnapshot place);
 
@@ -148,7 +148,7 @@ public class PlaceAdapter extends FirestoreAdapter<PlaceAdapter.ViewHolder> {
                 @Override
                 public void onClick(View view) {
                     if (listener != null) {
-                        listener.onPlaceSelected(snapshot);
+                        listener.onPlaceSelected(snapshot, getAdapterPosition());
                     }
                 }
             });

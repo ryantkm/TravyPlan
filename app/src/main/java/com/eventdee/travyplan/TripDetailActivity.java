@@ -50,6 +50,7 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
     private String mTripId;
     private String mPlaceId;
     private Trip mTrip;
+    private int mPosition;
 
     @BindView(R.id.iv_trip_photo)
     ImageView ivTripPhoto;
@@ -129,6 +130,9 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
         mPlaceRecycler.setLayoutManager(new LinearLayoutManager(this));
         mPlaceRecycler.setAdapter(mPlaceAdapter);
 
+        mPlaceAdapter.startListening();
+        mTripRegistration = mTripRef.addSnapshotListener(this);
+
         mTransportDialogFragment = new TransportDialogFragment();
     }
 
@@ -136,14 +140,22 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
     public void onStart() {
         super.onStart();
 
-        mPlaceAdapter.startListening();
-        mTripRegistration = mTripRef.addSnapshotListener(this);
+        mPlaceRecycler.getLayoutManager().scrollToPosition(mPosition);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 
     @Override
     public void onStop() {
         super.onStop();
+    }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
         mPlaceAdapter.stopListening();
 
         if (mTripRegistration != null) {
@@ -228,7 +240,11 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
     }
 
     @Override
-    public void onPlaceSelected(DocumentSnapshot place) {
+    public void onPlaceSelected(DocumentSnapshot place, int position) {
+        mPlaceRecycler.scrollToPosition(position);
+        mPosition = position;
+        Toast.makeText(this, "postion selected " + position, Toast.LENGTH_SHORT).show();
+
         mPlaceId = place.getId();
         TravyPlace travyPlace = place.toObject(TravyPlace.class);
         Intent placeIntent = new Intent(this, PlaceDetailActivity.class);
@@ -264,8 +280,6 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
                                 Toast.makeText(TripDetailActivity.this, place.getString("name") + " deleted!", Toast.LENGTH_SHORT).show();
                                 if (position == 0) {
                                     mPlaceRecycler.setAdapter(mPlaceAdapter);
-//                                    mPlaceAdapter.notifyItemChanged(0);
-                                    //TODO: need to refactor as removal animation is not smooth
                                 }
                             }
                         })
