@@ -231,7 +231,7 @@ public class AddTripActivity extends AppCompatActivity {
                 uploadFromUri(mPhotoUri);
                 return true;
             case R.id.action_photo:
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
                 intent.setType("image/*");
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
                 if (intent.resolveActivity(getPackageManager()) != null) {

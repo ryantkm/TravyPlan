@@ -20,7 +20,7 @@ public class General {
 
     public static SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.US);
     public static SimpleDateFormat dateFormatPlace = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
-    public static SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm", Locale.US);
+    public static SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.US);
 
     /**
      * Get a random image.
