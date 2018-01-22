@@ -1,11 +1,16 @@
 package com.eventdee.travyplan;
 
+import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.ClipData;
+import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -24,6 +29,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.eventdee.travyplan.adapter.PlaceAdapter;
 import com.eventdee.travyplan.model.TravyPlace;
 import com.eventdee.travyplan.model.Trip;
+import com.eventdee.travyplan.service.MyUploadService;
 import com.eventdee.travyplan.utils.Constants;
 import com.eventdee.travyplan.utils.General;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -74,6 +80,13 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
     private Date mStartDate, mEndDate;
 
     private ArrayList<String> mPhotosArray = new ArrayList<>();
+
+    // firebase storage
+    private Uri mDownloadUrl = null;
+    private Uri mFileUri = null;
+    private Uri mPhotoUri;
+    private BroadcastReceiver mBroadcastReceiver;
+    private ProgressDialog mProgressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,6 +147,22 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
         mTripRegistration = mTripRef.addSnapshotListener(this);
 
         mTransportDialogFragment = new TransportDialogFragment();
+
+        // Local broadcast receiver
+        mBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.d(TAG, "onReceive:" + intent);
+                hideProgressDialog();
+
+                switch (intent.getAction()) {
+                    case MyUploadService.UPLOAD_COMPLETED:
+                    case MyUploadService.UPLOAD_ERROR:
+                        onUploadResultIntent(intent);
+                        break;
+                }
+            }
+        };
     }
 
     @Override
@@ -141,6 +170,11 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
         super.onStart();
 
         mPlaceRecycler.getLayoutManager().scrollToPosition(mPosition);
+
+        // Register receiver for uploads and downloads
+        LocalBroadcastManager manager = LocalBroadcastManager.getInstance(this);
+//        manager.registerReceiver(mBroadcastReceiver, MyDownloadService.getIntentFilter());
+        manager.registerReceiver(mBroadcastReceiver, MyUploadService.getIntentFilter());
     }
 
     @Override
@@ -151,6 +185,8 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
     @Override
     public void onStop() {
         super.onStop();
+        // Unregister download receiver
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver);
     }
 
     @Override
@@ -241,9 +277,7 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
 
     @Override
     public void onPlaceSelected(DocumentSnapshot place, int position) {
-        mPlaceRecycler.scrollToPosition(position);
         mPosition = position;
-        Toast.makeText(this, "postion selected " + position, Toast.LENGTH_SHORT).show();
 
         mPlaceId = place.getId();
         TravyPlace travyPlace = place.toObject(TravyPlace.class);
@@ -267,6 +301,7 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
         mPlaceId = place.getId();
         TravyPlace travyPlace = place.toObject(TravyPlace.class);
         if (travyPlace.getPhotos() != null) {
+            mPhotosArray.clear();
             mPhotosArray = travyPlace.getPhotos();
         }
         switch (item.getItemId()) {
@@ -332,29 +367,78 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == Constants.RC_GET_IMAGE && resultCode == RESULT_OK && data != null) {
             if (data.getClipData() != null) {
+                // if multiple photos are selected
                 ClipData clipData = data.getClipData();
                 for (int i = 0; i < clipData.getItemCount(); i++) {
                     ClipData.Item item = clipData.getItemAt(i);
                     String photoUri = item.getUri().toString();
-                    mPhotosArray.add(photoUri);
+                    uploadFromUri(Uri.parse(photoUri));
                 }
             } else if (data.getData() != null) {
+                // if only one image is selected
                 String photoUri = data.getData().toString();
-                mPhotosArray.add(photoUri);
+                uploadFromUri(Uri.parse(photoUri));
             }
-            mTripRef.collection("places").document(mPlaceId).update("photos", mPhotosArray)
-                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Log.d(TAG, "DocumentSnapshot successfully updated!");
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.w(TAG, "Error updating document", e);
-                        }
-                    });
         }
+    }
+
+    private void showProgressDialog(String caption) {
+        if (mProgressDialog == null) {
+            mProgressDialog = new ProgressDialog(this);
+            mProgressDialog.setIndeterminate(true);
+        }
+
+        mProgressDialog.setMessage(caption);
+        mProgressDialog.show();
+    }
+
+    private void hideProgressDialog() {
+        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+            mProgressDialog.dismiss();
+        }
+    }
+
+
+    private void uploadFromUri(Uri fileUri) {
+        Log.d(TAG, "uploadFromUri:src:" + fileUri.toString());
+
+        // Clear the last download, if any
+        mDownloadUrl = null;
+
+        // Start MyUploadService to upload the file, so that the file is uploaded
+        // even if this Activity is killed or put in the background
+        startService(new Intent(this, MyUploadService.class)
+                .putExtra(MyUploadService.EXTRA_FILE_URI, fileUri)
+                .setAction(MyUploadService.ACTION_UPLOAD));
+
+        // Show loading spinner
+        showProgressDialog(getString(R.string.progress_uploading));
+    }
+
+    private void onUploadResultIntent(Intent intent) {
+        // Got a new intent from MyUploadService with a success or failure
+        mDownloadUrl = intent.getParcelableExtra(MyUploadService.EXTRA_DOWNLOAD_URL);
+        mFileUri = intent.getParcelableExtra(MyUploadService.EXTRA_FILE_URI);
+
+        // download uri will be null if trip is updated with the same cover photo
+        if (mDownloadUrl == null) {
+            mDownloadUrl = mFileUri;
+        }
+        mPhotosArray.add(mDownloadUrl.toString());
+
+        //TODO: to include a boolean to check if it is the last photo else it will be saving to firestore for every photo
+        mTripRef.collection("places").document(mPlaceId).update("photos", mPhotosArray)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "DocumentSnapshot successfully updated!");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error updating document", e);
+                    }
+                });
     }
 }
