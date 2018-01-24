@@ -108,6 +108,11 @@ public class AddPlaceActivity extends AppCompatActivity implements View.OnClickL
             editTextNotes.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
         } else {
             btnAdd.setText("Add");
+            datePicker.setText(General.dateFormat.format(calendar.getTime()));
+            datePicker.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+
+            timePicker.setText(General.timeFormat.format(calendar.getTime()));
+            timePicker.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
         }
 
         if (mTripId == null) {

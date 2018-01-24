@@ -82,8 +82,6 @@ public class PlaceAdapter extends FirestoreAdapter<PlaceAdapter.ViewHolder> {
         @BindView(R.id.iv_more)
         ImageView ivMoreOptions;
 
-//        @BindView(R.id.connected_line)
-//        View connectedLine;
         @BindView(R.id.iv_transport_icon)
         ImageView ivTransportIcon;
 
@@ -98,6 +96,9 @@ public class PlaceAdapter extends FirestoreAdapter<PlaceAdapter.ViewHolder> {
         public void bind(final DocumentSnapshot snapshot,
                          final OnPlaceSelectedListener listener) {
 
+            // seems that without this line of code, the recycled itemview of the first one will be used and icon will be gone
+            ivTransportIcon.setVisibility(View.VISIBLE);
+
             TravyPlace travyPlace = snapshot.toObject(TravyPlace.class);
             String transportMode = travyPlace.getTransportMode();
             int indexPosition = transportModeArrayList.indexOf(transportMode);
@@ -105,12 +106,6 @@ public class PlaceAdapter extends FirestoreAdapter<PlaceAdapter.ViewHolder> {
             if (indexPosition == -1) {
                 indexPosition = transportModeArrayList.indexOf("others");
             }
-            // Load image
-//            Glide.with(ivPhoto.getContext())
-//                    .load(trip.getCoverPhoto())
-//                    .apply(new RequestOptions()
-//                            .centerCrop())
-//                    .into(ivPhoto);
 
             tvPlaceName.setText(travyPlace.getName());
             tvPlaceType.setText(General.setAndroidType(travyPlace.getPlaceTypes()));
@@ -130,16 +125,13 @@ public class PlaceAdapter extends FirestoreAdapter<PlaceAdapter.ViewHolder> {
 
             if (transportMode == null) {
                 ivTransportIcon.setImageResource(R.drawable.ic_crop_free_36dp);
-//                connectedLine.setVisibility(View.GONE);
             } else {
                 ivTransportIcon.setVisibility(View.VISIBLE);
-//                connectedLine.setVisibility(View.VISIBLE);
                 Drawable selectedTransportDrawable = transportIconArray.getDrawable(indexPosition);
                 ivTransportIcon.setImageDrawable(selectedTransportDrawable);
             }
             if (getAdapterPosition() == 0) {
                 ivTransportIcon.setVisibility(View.GONE);
-//                connectedLine.setVisibility(View.GONE);
 //                setIsRecyclable(false);
             }
 
