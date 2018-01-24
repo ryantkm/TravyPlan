@@ -143,6 +143,9 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
         mPlaceRecycler.setLayoutManager(new LinearLayoutManager(this));
         mPlaceRecycler.setAdapter(mPlaceAdapter);
 
+        mTripRegistration = mTripRef.addSnapshotListener(this);
+        mPlaceAdapter.startListening();
+
         mTransportDialogFragment = new TransportDialogFragment();
 
         // Local broadcast receiver
@@ -165,8 +168,6 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
     @Override
     public void onStart() {
         super.onStart();
-        mPlaceAdapter.startListening();
-        mTripRegistration = mTripRef.addSnapshotListener(this);
         mPlaceRecycler.getLayoutManager().scrollToPosition(mPosition);
 
         // Register receiver for uploads and downloads
@@ -183,13 +184,19 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
     @Override
     public void onStop() {
         super.onStop();
+        // Unregister download receiver
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // need to have the below in destroy and create in order for the move to position to work
         mPlaceAdapter.stopListening();
         if (mTripRegistration != null) {
             mTripRegistration.remove();
             mTripRegistration = null;
         }
-        // Unregister download receiver
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver);
     }
 
     @Override
