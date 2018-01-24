@@ -12,19 +12,40 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
+import java.util.TimeZone;
 
 public class General {
 
-    private static final String RESTAURANT_URL_FMT = "https://storage.googleapis.com/firestorequickstarts.appspot.com/food_%d.png";
-    private static final int MAX_IMAGE_NUM = 22;
+//    public static SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.US);
+//    public static SimpleDateFormat dateFormatPlace = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
+//    public static SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.US);
 
-    public static SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.US);
-    public static SimpleDateFormat dateFormatPlace = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
-    public static SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.US);
+    public static SimpleDateFormat dateFormat;
+
+    static {
+        dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.US);
+        dateFormat.setTimeZone(TimeZone.getDefault());
+    }
+
+    public static SimpleDateFormat dateFormatPlace;
+
+    static {
+        dateFormatPlace = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
+        dateFormatPlace.setTimeZone(TimeZone.getDefault());
+    }
+
+    public static SimpleDateFormat timeFormat;
+
+    static {
+        timeFormat = new SimpleDateFormat("HH:mm", Locale.US);
+        timeFormat.setTimeZone(TimeZone.getDefault());
+    }
 
     /**
      * Get a random image.
      */
+    private static final String RESTAURANT_URL_FMT = "https://storage.googleapis.com/firestorequickstarts.appspot.com/food_%d.png";
+    private static final int MAX_IMAGE_NUM = 22;
     public static String getRandomImageUrl(Random random) {
         // Integer between 1 and MAX_IMAGE_NUM (inclusive)
         int id = random.nextInt(MAX_IMAGE_NUM) + 1;
