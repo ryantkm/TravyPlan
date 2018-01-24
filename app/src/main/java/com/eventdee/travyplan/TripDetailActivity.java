@@ -143,9 +143,6 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
         mPlaceRecycler.setLayoutManager(new LinearLayoutManager(this));
         mPlaceRecycler.setAdapter(mPlaceAdapter);
 
-        mPlaceAdapter.startListening();
-        mTripRegistration = mTripRef.addSnapshotListener(this);
-
         mTransportDialogFragment = new TransportDialogFragment();
 
         // Local broadcast receiver
@@ -168,7 +165,8 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
     @Override
     public void onStart() {
         super.onStart();
-
+        mPlaceAdapter.startListening();
+        mTripRegistration = mTripRef.addSnapshotListener(this);
         mPlaceRecycler.getLayoutManager().scrollToPosition(mPosition);
 
         // Register receiver for uploads and downloads
@@ -185,19 +183,13 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
     @Override
     public void onStop() {
         super.onStop();
-        // Unregister download receiver
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
         mPlaceAdapter.stopListening();
-
         if (mTripRegistration != null) {
             mTripRegistration.remove();
             mTripRegistration = null;
         }
+        // Unregister download receiver
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver);
     }
 
     @Override
@@ -397,7 +389,6 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
             mProgressDialog.dismiss();
         }
     }
-
 
     private void uploadFromUri(Uri fileUri) {
         Log.d(TAG, "uploadFromUri:src:" + fileUri.toString());
