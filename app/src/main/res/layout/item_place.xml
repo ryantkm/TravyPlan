@@ -115,13 +115,24 @@
 
             </LinearLayout>
 
-            <ss.com.bannerslider.views.BannerSlider
+            <RelativeLayout
                 android:id="@+id/banner_slider"
                 android:layout_width="match_parent"
                 android:layout_height="300dp"
-                android:visibility="gone"
-                app:defaultBanner="1"
-                app:defaultIndicators="circle" />
+                android:visibility="visible">
+                <android.support.v4.view.ViewPager
+                    android:id="@+id/view_pager"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </RelativeLayout>
+
+            <!--<ss.com.bannerslider.views.BannerSlider-->
+                <!--android:id="@+id/banner_slider"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="300dp"-->
+                <!--android:visibility="gone"-->
+                <!--app:defaultBanner="1"-->
+                <!--app:defaultIndicators="circle" />-->
 
         </LinearLayout>
 

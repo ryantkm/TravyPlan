@@ -75,6 +75,7 @@ dependencies {
     implementation 'com.ss.bannerslider:bannerslider:1.8.0'
     // rating bar
     implementation 'me.zhanghai.android.materialratingbar:library:1.0.2'
+
 }
 
 

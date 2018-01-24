@@ -3,6 +3,7 @@ package com.eventdee.travyplan.adapter;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -10,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.eventdee.travyplan.R;
@@ -20,13 +22,9 @@ import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import ss.com.bannerslider.banners.Banner;
-import ss.com.bannerslider.banners.RemoteBanner;
-import ss.com.bannerslider.views.BannerSlider;
 
 public class PlaceAdapter extends FirestoreAdapter<PlaceAdapter.ViewHolder> {
 
@@ -86,7 +84,11 @@ public class PlaceAdapter extends FirestoreAdapter<PlaceAdapter.ViewHolder> {
         ImageView ivTransportIcon;
 
         @BindView(R.id.banner_slider)
-        BannerSlider mBannerSlider;
+        RelativeLayout mBannerSlider;
+//        BannerSlider mBannerSlider;
+
+        @BindView(R.id.view_pager)
+        ViewPager mViewPager;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -114,14 +116,22 @@ public class PlaceAdapter extends FirestoreAdapter<PlaceAdapter.ViewHolder> {
 
             if (travyPlace.getPhotos() != null) {
                 mBannerSlider.setVisibility(View.VISIBLE);
-                List<Banner> banners = new ArrayList<>();
-                for (int i = 0; i < travyPlace.getPhotos().size(); i++) {
-                    banners.add(new RemoteBanner(travyPlace.getPhotos().get(i)));
-                }
-                mBannerSlider.setBanners(banners);
+                PhotoPagerAdapter myCustomPagerAdapter = new PhotoPagerAdapter(mContext, travyPlace.getPhotos());
+                mViewPager.setAdapter(myCustomPagerAdapter);
             } else {
                 mBannerSlider.setVisibility(View.GONE);
             }
+
+//            if (travyPlace.getPhotos() != null) {
+//                mBannerSlider.setVisibility(View.VISIBLE);
+//                List<Banner> banners = new ArrayList<>();
+//                for (int i = 0; i < travyPlace.getPhotos().size(); i++) {
+//                    banners.add(new RemoteBanner(travyPlace.getPhotos().get(i)));
+//                }
+//                mBannerSlider.setBanners(banners);
+//            } else {
+//                mBannerSlider.setVisibility(View.GONE);
+//            }
 
             if (transportMode == null) {
                 ivTransportIcon.setImageResource(R.drawable.ic_crop_free_36dp);
