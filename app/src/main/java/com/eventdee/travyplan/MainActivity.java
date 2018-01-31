@@ -108,6 +108,7 @@ public class MainActivity extends AppCompatActivity
 
         // Get ${LIMIT} restaurants
         mQuery = mFirestore.collection("trips")
+//                .whereEqualTo("roles."+firebaseUser.getUid(), "owner")
                 .orderBy("startDate", Query.Direction.DESCENDING);
 
         // RecyclerView

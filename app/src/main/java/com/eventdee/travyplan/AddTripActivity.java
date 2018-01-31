@@ -30,6 +30,7 @@ import com.eventdee.travyplan.utils.Constants;
 import com.eventdee.travyplan.utils.General;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -69,6 +70,7 @@ public class AddTripActivity extends AppCompatActivity {
     SharedPreferences.Editor editor;
 
     private FirebaseFirestore mFirestore;
+    private FirebaseAuth firebaseAuth;
 
     // firebase storage
     private Uri mDownloadUrl = null;
@@ -81,6 +83,8 @@ public class AddTripActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_trip);
         ButterKnife.bind(this);
+
+        firebaseAuth = FirebaseAuth.getInstance();
 
         // setting the flags to mimick windowTranslucentStatus ie content below status bar. color set to transparent so that there is no tint
         getWindow().getDecorView().setSystemUiVisibility(
@@ -253,7 +257,7 @@ public class AddTripActivity extends AppCompatActivity {
             mTripName = etTripName.getText().toString().trim();
         }
 
-        mNewTrip = new Trip(mTripName, mStartDate.getTime(), mEndDate.getTime(), downloadUri.toString());
+        mNewTrip = new Trip(mTripName, mStartDate.getTime(), mEndDate.getTime(), downloadUri.toString(), firebaseAuth.getCurrentUser().getUid());
 
         if (mSource.equalsIgnoreCase("MainActivity")) {
             try {

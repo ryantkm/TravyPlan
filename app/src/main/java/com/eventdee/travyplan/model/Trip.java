@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.util.Date;
+import java.util.HashMap;
 
 public class Trip implements Parcelable {
 
@@ -12,14 +13,19 @@ public class Trip implements Parcelable {
     private Date endDate;
     private String coverPhoto;
 
+    private String visibility;
+    private HashMap<String, String> roles = new HashMap<String, String>();
+
     public Trip() {
     }
 
-    public Trip(String name, Date startDate, Date endDate, String coverPhoto) {
+    public Trip(String name, Date startDate, Date endDate, String coverPhoto, String userid) {
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
         this.coverPhoto = coverPhoto;
+        this.visibility = "public";
+        this.roles.put(userid, "owner");
     }
 
     public String getName() {
@@ -54,6 +60,23 @@ public class Trip implements Parcelable {
         this.coverPhoto = coverPhoto;
     }
 
+    public String getVisibility() {
+        return visibility;
+    }
+
+    public void setVisibility(String visibility) {
+        this.visibility = visibility;
+    }
+
+    public HashMap<String, String> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(HashMap<String, String> roles) {
+        this.roles = roles;
+    }
+
+
     @Override
     public int describeContents() {
         return 0;
@@ -65,6 +88,8 @@ public class Trip implements Parcelable {
         dest.writeLong(this.startDate != null ? this.startDate.getTime() : -1);
         dest.writeLong(this.endDate != null ? this.endDate.getTime() : -1);
         dest.writeString(this.coverPhoto);
+        dest.writeString(this.visibility);
+        dest.writeSerializable(this.roles);
     }
 
     protected Trip(Parcel in) {
@@ -74,6 +99,8 @@ public class Trip implements Parcelable {
         long tmpEndDate = in.readLong();
         this.endDate = tmpEndDate == -1 ? null : new Date(tmpEndDate);
         this.coverPhoto = in.readString();
+        this.visibility = in.readString();
+        this.roles = (HashMap<String, String>) in.readSerializable();
     }
 
     public static final Parcelable.Creator<Trip> CREATOR = new Parcelable.Creator<Trip>() {
