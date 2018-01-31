@@ -34,6 +34,7 @@ import com.eventdee.travyplan.utils.Constants;
 import com.eventdee.travyplan.utils.General;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -55,6 +56,7 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
     public static final String KEY_PLACE_ID = "key_place_id";
     private String mTripId;
     private String mPlaceId;
+    private String mUserId;
     private Trip mTrip;
     private int mPosition;
 
@@ -70,7 +72,9 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
     CollapsingToolbarLayout mCollapsingToolbar;
 
     private FirebaseFirestore mFirestore;
+    private FirebaseAuth mFirebaseAuth;
     private DocumentReference mTripRef;
+    private DocumentReference mVisibleTripRef;
     private ListenerRegistration mTripRegistration;
 
     private PlaceAdapter mPlaceAdapter;
@@ -106,6 +110,7 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
                 addPlace.putExtra("endDate", mEndDate.getTime());
                 addPlace.putExtra(KEY_TRIP_ID, mTripId);
                 addPlace.putExtra("tag", TAG);
+                addPlace.putExtra("visibility", mTrip.getVisibility());
                 startActivityForResult(addPlace, Constants.RC_ADD_TRIP_ITEM);
             }
         });
@@ -118,9 +123,12 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
 
         // Initialize Firestore
         mFirestore = FirebaseFirestore.getInstance();
+        mFirebaseAuth = FirebaseAuth.getInstance();
+        mUserId = mFirebaseAuth.getUid();
 
         // Get reference to the trip
-        mTripRef = mFirestore.collection("trips").document(mTripId);
+        mTripRef = mFirestore.collection("users").document(mUserId).collection("trips").document(mTripId);
+        mVisibleTripRef = mFirestore.collection("visibleTrips").document(mTripId);
 
         // Get trip items
         Query itemsQuery = mTripRef
@@ -240,6 +248,24 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
                                 Log.w(TAG, "Error deleting document", e);
                             }
                         });
+                if (mTrip.getVisibility().equalsIgnoreCase("public")) {
+                    mVisibleTripRef
+                            .delete()
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Log.d(TAG, "Trip successfully deleted!");
+                                    Toast.makeText(TripDetailActivity.this, "Trip deleted!", Toast.LENGTH_SHORT).show();
+                                    finish();
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.w(TAG, "Error deleting document", e);
+                                }
+                            });
+                }
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -286,6 +312,7 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
         placeIntent.putExtra("place", travyPlace);
         placeIntent.putExtra("startDate", mStartDate.getTime());
         placeIntent.putExtra("endDate", mEndDate.getTime());
+        placeIntent.putExtra("visibility", mTrip.getVisibility());
         startActivity(placeIntent);
     }
 
@@ -323,6 +350,22 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
                                 Log.w(TAG, "Error deleting document", e);
                             }
                         });
+                if (mTrip.getVisibility().equalsIgnoreCase("public")) {
+                    mVisibleTripRef.collection("places").document(mPlaceId)
+                            .delete()
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Log.d(TAG, "Trip successfully deleted!");
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.w(TAG, "Error deleting document", e);
+                                }
+                            });
+                }
                 break;
             case R.id.action_add_photos:
                 mPlaceId = place.getId();
@@ -359,6 +402,22 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
                         Log.w(TAG, "Error updating document", e);
                     }
                 });
+        if (mTrip.getVisibility().equalsIgnoreCase("public")) {
+            mVisibleTripRef.collection("places").document(mPlaceId)
+                    .update("transportMode", transportName)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d(TAG, "TransportMode successfully updated!");
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.w(TAG, "Error updating document", e);
+                        }
+                    });
+        }
         mTransportDialogFragment.dismiss();
     }
 
@@ -438,5 +497,21 @@ public class TripDetailActivity extends AppCompatActivity implements EventListen
                         Log.w(TAG, "Error updating document", e);
                     }
                 });
+
+        if (mTrip.getVisibility().equalsIgnoreCase("public")) {
+            mVisibleTripRef.collection("places").document(mPlaceId).update("photos", mPhotosArray)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d(TAG, "DocumentSnapshot successfully updated!");
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.w(TAG, "Error updating document", e);
+                        }
+                    });
+        }
     }
 }

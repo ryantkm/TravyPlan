@@ -57,7 +57,7 @@ public class TripAdapter extends FirestoreAdapter<TripAdapter.ViewHolder> {
         }
 
         public void bind(final DocumentSnapshot snapshot, final OnTripSelectedListener listener) {
-            Trip trip = snapshot.toObject(Trip.class);
+            final Trip trip = snapshot.toObject(Trip.class);
 
             Glide.with(ivPhoto.getContext())
                     .load(trip.getCoverPhoto())

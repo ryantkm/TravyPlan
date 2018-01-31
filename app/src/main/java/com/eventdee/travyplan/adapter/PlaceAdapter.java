@@ -30,6 +30,7 @@ import butterknife.ButterKnife;
 public class PlaceAdapter extends FirestoreAdapter<PlaceAdapter.ViewHolder> {
 
     private Context mContext;
+//    private String mTripId;
 
     private String[] transportModeArray;
     private ArrayList<String> transportModeArrayList;
@@ -104,7 +105,25 @@ public class PlaceAdapter extends FirestoreAdapter<PlaceAdapter.ViewHolder> {
             // seems that without this line of code, the recycled itemview of the first one will be used and icon will be gone
             ivTransportIcon.setVisibility(View.VISIBLE);
 
-            TravyPlace travyPlace = snapshot.toObject(TravyPlace.class);
+            final TravyPlace travyPlace = snapshot.toObject(TravyPlace.class);
+
+//            FirebaseFirestore mFirestore = FirebaseFirestore.getInstance();
+//            mFirestore.collection("visibleTrips").document("E7LyBl61OcxNLRiXd3U4").collection("places")
+//                    .add(travyPlace)
+//                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+//                        @Override
+//                        public void onSuccess(DocumentReference documentReference) {
+//                            String tripId = documentReference.getId();
+//                            Log.d("Ryan", "DocumentSnapshot written with ID: " + tripId + " placename: " + travyPlace.getName());
+//                        }
+//                    })
+//                    .addOnFailureListener(new OnFailureListener() {
+//                        @Override
+//                        public void onFailure(@NonNull Exception e) {
+//                            Log.w("Ryan", "Error adding document", e);
+//                        }
+//                    });
+
             String transportMode = travyPlace.getTransportMode();
             int indexPosition = transportModeArrayList.indexOf(transportMode);
 

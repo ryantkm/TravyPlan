@@ -51,8 +51,8 @@ public class MainActivity extends AppCompatActivity
     @BindView(R.id.view_empty_main)
     ViewGroup mEmptyView;
 
-    private FirebaseAuth firebaseAuth;
-    private FirebaseUser firebaseUser;
+    private FirebaseAuth mFirebaseAuth;
+    private FirebaseUser mFirebaseUser;
 
     private FirebaseFirestore mFirestore;
     private Query mQuery;
@@ -66,8 +66,8 @@ public class MainActivity extends AppCompatActivity
             IdpResponse response = IdpResponse.fromResultIntent(data);
             if (resultCode == RESULT_OK) {
                 // Successfully signed in
-                firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-                Toast.makeText(this, "Welcome " + firebaseUser.getDisplayName() + "!", Toast.LENGTH_SHORT).show();
+                mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+                Toast.makeText(this, "Welcome " + mFirebaseUser.getDisplayName() + "!", Toast.LENGTH_SHORT).show();
             } else if (resultCode == RESULT_CANCELED) {
                 Toast.makeText(this, "Sign in cancelled!", Toast.LENGTH_SHORT).show();
                 startSignIn();
@@ -100,15 +100,15 @@ public class MainActivity extends AppCompatActivity
         // Enable Firestore logging
         FirebaseFirestore.setLoggingEnabled(true);
 
-        firebaseAuth = FirebaseAuth.getInstance();
-        firebaseUser = firebaseAuth.getCurrentUser();
+        mFirebaseAuth = FirebaseAuth.getInstance();
+        mFirebaseUser = mFirebaseAuth.getCurrentUser();
 
         // Firestore
         mFirestore = FirebaseFirestore.getInstance();
 
         // Get ${LIMIT} restaurants
-        mQuery = mFirestore.collection("trips")
-//                .whereEqualTo("roles."+firebaseUser.getUid(), "owner")
+        mQuery = mFirestore.collection("users").document(mFirebaseUser.getUid()).collection("trips")
+//                .whereEqualTo("roles."+mFirebaseUser.getUid(), "owner")
                 .orderBy("startDate", Query.Direction.DESCENDING);
 
         // RecyclerView
@@ -221,7 +221,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private boolean shouldStartSignIn() {
-        return (firebaseUser == null);
+        return (mFirebaseUser == null);
     }
 
     private void startSignIn() {

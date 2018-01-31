@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -27,6 +28,9 @@ import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceDetectionClient;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -41,8 +45,9 @@ import static com.eventdee.travyplan.TripDetailActivity.KEY_TRIP_ID;
 
 public class AddPlaceActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener{
 
+    public static final String TAG = AddPlaceActivity.class.getSimpleName();
     private Date mStartDate, mEndDate;
-    private String mTripId, mPlaceId;
+    private String mTripId, mPlaceId, mVisibility, mUserId;
     private int mYear, mMonth, mDay, mHour, mMinute;
     private Calendar calendar = Calendar.getInstance();
     private String timeSelectedString;
@@ -54,7 +59,9 @@ public class AddPlaceActivity extends AppCompatActivity implements View.OnClickL
 
     // firestore variables;
     private FirebaseFirestore mFirestore;
+    private FirebaseAuth mFirebaseAuth;
     private DocumentReference mTripRef;
+    private DocumentReference mVisibleTripRef;
 
     private TravyPlace newTravyPlace;
 
@@ -83,6 +90,7 @@ public class AddPlaceActivity extends AppCompatActivity implements View.OnClickL
         mTripId = intent.getStringExtra(KEY_TRIP_ID);
         mStartDate = new Date(intent.getLongExtra("startDate",0));
         mEndDate = new Date(intent.getLongExtra("endDate",0));
+        mVisibility =intent.getStringExtra("visibility");
 
         if (mSource.equalsIgnoreCase("PlaceDetailActivity")) {
 
@@ -121,8 +129,12 @@ public class AddPlaceActivity extends AppCompatActivity implements View.OnClickL
 
         // Initialize Firestore
         mFirestore = FirebaseFirestore.getInstance();
+        mFirebaseAuth = FirebaseAuth.getInstance();
+        mUserId = mFirebaseAuth.getUid();
+
         // Get reference to the trip
-        mTripRef = mFirestore.collection("trips").document(mTripId);
+        mTripRef = mFirestore.collection("users").document(mUserId).collection("trips").document(mTripId);
+        mVisibleTripRef = mFirestore.collection("visibleTrips").document(mTripId);
 
         mGoogleApiClient = new GoogleApiClient
                 .Builder(this)
@@ -234,8 +246,38 @@ public class AddPlaceActivity extends AppCompatActivity implements View.OnClickL
                     newTravyPlace.setDate(calendar.getTime());
                     newTravyPlace.setNotes(editTextNotes.getText().toString().trim());
 
-                    mTripRef.collection("places").add(newTravyPlace);
-                    Toast.makeText(this, "location added: " + newTravyPlace.getName(), Toast.LENGTH_SHORT).show();
+                    mTripRef.collection("places")
+                            .add(newTravyPlace)
+                            .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                @Override
+                                public void onSuccess(DocumentReference documentReference) {
+                                    String placeId = documentReference.getId();
+                                    Log.d(TAG, "DocumentSnapshot written with ID: " + placeId);
+
+                                    if (mVisibility.equalsIgnoreCase("public")) {
+                                        mVisibleTripRef.collection("places").document(placeId)
+                                                .set(newTravyPlace)
+                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        Log.d(TAG, "DocumentSnapshot successfully written!");
+                                                    }
+                                                })
+                                                .addOnFailureListener(new OnFailureListener() {
+                                                    @Override
+                                                    public void onFailure(@NonNull Exception e) {
+                                                        Log.w(TAG, "Error writing document", e);
+                                                    }
+                                                });
+                                    }
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.w(TAG, "Error adding document", e);
+                                }
+                            });
                     finish();
                 }
             }else if (mSource.equalsIgnoreCase("PlaceDetailActivity")) {
@@ -243,6 +285,9 @@ public class AddPlaceActivity extends AppCompatActivity implements View.OnClickL
                 newTravyPlace.setNotes(editTextNotes.getText().toString().trim());
 
                 mTripRef.collection("places").document(mPlaceId).set(newTravyPlace);
+                if (mVisibility.equalsIgnoreCase("public")) {
+                    mVisibleTripRef.collection("places").document(mPlaceId).set(newTravyPlace);
+                }
                 Toast.makeText(this, "location updated: " + newTravyPlace.getName(), Toast.LENGTH_SHORT).show();
 
                 Intent intent = new Intent();

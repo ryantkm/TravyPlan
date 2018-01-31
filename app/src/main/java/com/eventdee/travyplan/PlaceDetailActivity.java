@@ -25,6 +25,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -59,12 +60,14 @@ public class PlaceDetailActivity extends AppCompatActivity implements OnMapReady
     TextView mTvNotes;
 
     private TravyPlace mPlace;
-    private String mTripId, mPlaceId;
+    private String mTripId, mPlaceId, mVisibility;
     private Date mStartDate, mEndDate;
     private NotesDialogFragment mNotesDialog;
 
     private FirebaseFirestore mFirestore;
+    private FirebaseAuth mFirebaseAuth;
     private DocumentReference mPlaceRef;
+    private DocumentReference mVisiblePlaceRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +89,7 @@ public class PlaceDetailActivity extends AppCompatActivity implements OnMapReady
                 editPlace.putExtra(KEY_TRIP_ID, mTripId);
                 editPlace.putExtra("startDate", mStartDate.getTime());
                 editPlace.putExtra("endDate", mEndDate.getTime());
+                editPlace.putExtra("visibility", mVisibility);
                 startActivityForResult(editPlace, Constants.RC_UPDATE_PLACE);
 
 //                Snackbar.make(view, "Future Action: Display Edit Activity", Snackbar.LENGTH_LONG)
@@ -100,13 +104,16 @@ public class PlaceDetailActivity extends AppCompatActivity implements OnMapReady
         mPlaceId = intent.getStringExtra(KEY_PLACE_ID);
         mStartDate = new Date(intent.getLongExtra("startDate",0));
         mEndDate = new Date(intent.getLongExtra("endDate",0));
+        mVisibility =intent.getStringExtra("visibility");
 
         // Initialize Firestore
         mFirestore = FirebaseFirestore.getInstance();
 
-        // Get reference to the place
-        mPlaceRef = mFirestore.collection("trips").document(mTripId).collection("places").document(mPlaceId);
+        mFirebaseAuth = FirebaseAuth.getInstance();
 
+        // Get reference to the place
+        mPlaceRef = mFirestore.collection("users").document(mFirebaseAuth.getUid()).collection("trips").document(mTripId).collection("places").document(mPlaceId);
+        mVisiblePlaceRef = mFirestore.collection("visibleTrips").document(mTripId).collection("places").document(mPlaceId);
         updateUI();
 
         // Get the SupportMapFragment and request notification
@@ -198,6 +205,22 @@ public class PlaceDetailActivity extends AppCompatActivity implements OnMapReady
                         Log.w(TAG, "Error updating document", e);
                     }
                 });
+
+        if (mVisibility.equalsIgnoreCase("public")) {
+            mVisiblePlaceRef.update("notes", notes)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d(TAG, "DocumentSnapshot successfully updated!");
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.w(TAG, "Error updating document", e);
+                        }
+                    });
+        }
     }
 
     @Override

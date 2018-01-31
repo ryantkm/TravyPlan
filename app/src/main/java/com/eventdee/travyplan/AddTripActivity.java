@@ -70,7 +70,7 @@ public class AddTripActivity extends AppCompatActivity {
     SharedPreferences.Editor editor;
 
     private FirebaseFirestore mFirestore;
-    private FirebaseAuth firebaseAuth;
+    private FirebaseAuth mFirebaseAuth;
 
     // firebase storage
     private Uri mDownloadUrl = null;
@@ -84,7 +84,7 @@ public class AddTripActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_trip);
         ButterKnife.bind(this);
 
-        firebaseAuth = FirebaseAuth.getInstance();
+        mFirebaseAuth = FirebaseAuth.getInstance();
 
         // setting the flags to mimick windowTranslucentStatus ie content below status bar. color set to transparent so that there is no tint
         getWindow().getDecorView().setSystemUiVisibility(
@@ -257,17 +257,33 @@ public class AddTripActivity extends AppCompatActivity {
             mTripName = etTripName.getText().toString().trim();
         }
 
-        mNewTrip = new Trip(mTripName, mStartDate.getTime(), mEndDate.getTime(), downloadUri.toString(), firebaseAuth.getCurrentUser().getUid());
+        mNewTrip = new Trip(mTripName, mStartDate.getTime(), mEndDate.getTime(), downloadUri.toString(), mFirebaseAuth.getUid());
 
         if (mSource.equalsIgnoreCase("MainActivity")) {
             try {
-                mFirestore.collection("trips")
+                mFirestore.collection("users").document(mFirebaseAuth.getUid()).collection("trips")
                         .add(mNewTrip)
                         .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                             @Override
                             public void onSuccess(DocumentReference documentReference) {
                                 String tripId = documentReference.getId();
                                 Log.d(TAG, "DocumentSnapshot written with ID: " + tripId);
+
+                                mFirestore.collection("visibleTrips").document(tripId)
+                                        .set(mNewTrip)
+                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                Log.d(TAG, "DocumentSnapshot successfully written!");
+                                            }
+                                        })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Log.w(TAG, "Error writing document", e);
+                                            }
+                                        });
+
                                 // Go to the details page for adding details
                                 Intent intent = new Intent(getApplicationContext(), TripDetailActivity.class);
                                 intent.putExtra(TripDetailActivity.KEY_TRIP_ID, tripId);
@@ -286,11 +302,27 @@ public class AddTripActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         } else {
-            mFirestore.collection("trips").document(mEditTripId)
+            mFirestore.collection("users").document(mFirebaseAuth.getUid()).collection("trips").document(mEditTripId)
                     .set(mNewTrip)
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
+                            if (mNewTrip.getVisibility().equalsIgnoreCase("public")) {
+                                mFirestore.collection("visibleTrips").document(mEditTripId)
+                                        .set(mNewTrip)
+                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                Log.d(TAG, "DocumentSnapshot successfully written!");
+                                            }
+                                        })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Log.w(TAG, "Error writing document", e);
+                                            }
+                                        });
+                            }
                             Log.d(TAG, "DocumentSnapshot successfully written!");
                             finish();
                         }

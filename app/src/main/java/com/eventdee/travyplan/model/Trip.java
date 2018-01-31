@@ -3,8 +3,8 @@ package com.eventdee.travyplan.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 
 public class Trip implements Parcelable {
 
@@ -14,7 +14,8 @@ public class Trip implements Parcelable {
     private String coverPhoto;
 
     private String visibility;
-    private HashMap<String, String> roles = new HashMap<String, String>();
+    private String role;
+    private ArrayList<String> members = new ArrayList<>();
 
     public Trip() {
     }
@@ -25,7 +26,8 @@ public class Trip implements Parcelable {
         this.endDate = endDate;
         this.coverPhoto = coverPhoto;
         this.visibility = "public";
-        this.roles.put(userid, "owner");
+        this.role = "owner";
+        this.members.add(userid);
     }
 
     public String getName() {
@@ -68,14 +70,21 @@ public class Trip implements Parcelable {
         this.visibility = visibility;
     }
 
-    public HashMap<String, String> getRoles() {
-        return roles;
+    public String getRole() {
+        return role;
     }
 
-    public void setRoles(HashMap<String, String> roles) {
-        this.roles = roles;
+    public void setRole(String role) {
+        this.role = role;
     }
 
+    public ArrayList<String> getMembers() {
+        return members;
+    }
+
+    public void setMembers(ArrayList<String> members) {
+        this.members = members;
+    }
 
     @Override
     public int describeContents() {
@@ -89,7 +98,8 @@ public class Trip implements Parcelable {
         dest.writeLong(this.endDate != null ? this.endDate.getTime() : -1);
         dest.writeString(this.coverPhoto);
         dest.writeString(this.visibility);
-        dest.writeSerializable(this.roles);
+        dest.writeString(this.role);
+        dest.writeStringList(this.members);
     }
 
     protected Trip(Parcel in) {
@@ -100,7 +110,8 @@ public class Trip implements Parcelable {
         this.endDate = tmpEndDate == -1 ? null : new Date(tmpEndDate);
         this.coverPhoto = in.readString();
         this.visibility = in.readString();
-        this.roles = (HashMap<String, String>) in.readSerializable();
+        this.role = in.readString();
+        this.members = in.createStringArrayList();
     }
 
     public static final Parcelable.Creator<Trip> CREATOR = new Parcelable.Creator<Trip>() {
